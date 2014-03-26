@@ -1,8 +1,7 @@
 class CLASS:
-    def __init__(self, name, fields, intrusive = True):
+    def __init__(self, name, fields):
         self.name = name
         self.fields = fields
-        self.intrusive = intrusive
 
     def cpp(self):
         name = self.name
@@ -15,21 +14,22 @@ class CLASS:
 
         out.extend(["class ", name, " {\n"])
 
-        if self.intrusive:
-            out.extend(["    char base[", ' + '.join(sizeof), "];\n\n"])
-        else:
-            out.extend(["    char * base;\n\n"])
+        out.extend(["    char * storage;\n\n"])
 
         out.extend(["public:\n"])
 
-        out.extend(["    ", name, "(char * base) : base(base) {}\n\n"])
+        out.extend(["    ", name, "(char * storage) : storage(storage) {}\n\n"])
 
         out.extend(["    int size() {\n"])
         out.extend(["        return ", ' + '.join(sizeof), ";\n"])
         out.extend(["    }\n\n"])
 
         out.extend(["    void zero() {\n"])
-        out.extend(["        std::memset(base, 0, size());\n"])
+        out.extend(["        std::memset(storage, 0, size());\n"])
+        out.extend(["    }\n\n"])
+
+        out.extend(["    char * base() {\n"])
+        out.extend(["        return storage;\n"])
         out.extend(["    }\n\n"])
 
         offset = []
@@ -43,7 +43,7 @@ class CLASS:
         for i in xrange(len(fields)):
             out.extend(fields[i].cpp(' + '.join(offset[i])))
 
-        out.extend(["}\n"])
+        out.extend(["};\n"])
 
         return ''.join(out)
 
@@ -63,7 +63,7 @@ class FIELD:
         out = []
         out.extend(["    char * ptr_to_", self.name, "() {\n"])
         out.extend(["        int off = ", offset_str, ";\n"])
-        out.extend(["        return base + off;\n"])
+        out.extend(["        return storage + off;\n"])
         out.extend(["    }\n\n"])
         out.extend(["    int size_of_", self.name, "() {\n"])
         out.extend(["        return ", self.sizeof(), ";\n"])
@@ -77,6 +77,19 @@ class FIELD:
             out.extend(["    }\n\n"])
             out.extend(["    void set_", self.name, "(", self.type, " x) {\n"])
             out.extend(["        std::memcpy(ptr_to_", self.name, "(), &x, sizeof(", self.type, "));\n"])
+            out.extend(["        return;\n"])
+            out.extend(["    }\n\n"])
+        else:
+            out.extend(["    int number_of_", self.name, "() {\n"])
+            out.extend(["        return ", str(self.array), ";\n"])
+            out.extend(["    }\n\n"])
+            out.extend(["    ", self.type, " get_", self.name, "(int idx) {\n"])
+            out.extend(["        ", self.type, " x;\n\n"])
+            out.extend(["        std::memcpy(&x, ptr_to_", self.name, "() + (sizeof(", self.type, ") * idx), sizeof(", self.type, "));\n"])
+            out.extend(["        return x;\n"])
+            out.extend(["    }\n\n"])
+            out.extend(["    void set_", self.name, "(int idx, ", self.type, " x) {\n"])
+            out.extend(["        std::memcpy(ptr_to_", self.name, "() + (sizeof(", self.type, ") * idx), &x, sizeof(", self.type, "));\n"])
             out.extend(["        return;\n"])
             out.extend(["    }\n\n"])
         return out
@@ -100,7 +113,7 @@ class BITFIELD:
             out.extend(["        ", self.root.type, " x = get_", self.root.name, "();\n\n"])
             out.extend(["        return ((x >> ", str(offset), ") & ((1 << ", str(field.bits), ") - 1));\n"])
             out.extend(["    }\n\n"])
-            out.extend(["    void set_", field.name, "(", field.type, " &x) {\n"])
+            out.extend(["    void set_", field.name, "(", field.type, " x) {\n"])
             out.extend(["        ", self.root.type, " y = get_", self.root.name, "();\n\n"])
             out.extend(["        y &= ~(((1 << ", str(field.bits), ") - 1) << ", str(offset), ");\n"]);
             out.extend(["        y |= (x << ", str(offset), ");\n"]);

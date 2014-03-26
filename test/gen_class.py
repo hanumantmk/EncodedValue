@@ -1,12 +1,16 @@
 from portable_packed_struct import *
 
-print(CLASS("ValueStorage", [
+print("#include <cstring>\n\n")
+
+print(CLASS("TestClass", [
     UNION(FIELD("long long", "i64", 2), [
         STRUCT([
             FIELD("char", "type"),
             BITFIELD(FIELD("unsigned char", "bm"), [
                 BITFIELDFIELD("unsigned", "refCounter", 1),
+                BITFIELDFIELD("unsigned", "pada", 4),
                 BITFIELDFIELD("unsigned", "shortStr", 1),
+                BITFIELDFIELD("unsigned", "padb", 2),
             ]),
             UNION(FIELD("char", "3_16", 14), [
                 FIELD("char", "oid", 12),
@@ -25,7 +29,6 @@ print(CLASS("ValueStorage", [
                         FIELD("double", "doubleValue"),
                         FIELD("bool", "boolValue"),
                         FIELD("int", "intValue"),
-                        FIELD("ReplTime", "timestampValue"),
                         FIELD("long long", "dateValue"),
                     ])
                 ])
@@ -34,9 +37,6 @@ print(CLASS("ValueStorage", [
     ])
 ]).cpp())
 
-print(CLASS("ValueSimple", [
-    FIELD("char", "first", 3),
-    FIELD("unsigned", "a"),
-    FIELD("unsigned", "b"),
-    FIELD("short", "c"),
-], False).cpp())
+print(CLASS("DoubleClass", [
+    FIELD("double", "doubleValue"),
+]).cpp())
