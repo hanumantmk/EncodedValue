@@ -130,16 +130,23 @@ class BITFIELDFIELD:
         self.bits = bits
 
 class UNION:
-    def __init__(self, root, fields):
-        self.root = root
+    def __init__(self, fields):
         self.fields = fields
 
     def sizeof(self):
-        return self.root.sizeof()
+        out = []
+        for i in xrange(len(self.fields) - 1):
+            out.extend([ "std::max(", self.fields[i].sizeof(), ", "])
+
+        out.append( self.fields[len(self.fields) - 1].sizeof() )
+
+        for i in xrange(len(self.fields) - 1):
+            out.append( ")" )
+
+        return ''.join(out)
 
     def cpp(self, offset_str):
         out = []
-        out.extend(self.root.cpp(offset_str))
 
         for field in self.fields:
             out.extend(field.cpp(offset_str))
@@ -155,7 +162,7 @@ class STRUCT:
         for field in self.fields:
             out.append(field.sizeof())
 
-        return ''.join(out)
+        return ' + '.join(out)
 
     def cpp(self, offset_str):
         fields = self.fields
