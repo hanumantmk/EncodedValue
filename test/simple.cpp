@@ -5,11 +5,10 @@
 
 void test_simple(void)
 {
-    char buf[16];
-
-    TestClass tc(buf);
+    TestClass tc;
 
     assert(tc.size() == 16);
+    assert(tc.size() == sizeof(tc));
 
     tc.set_type( 5 );
 

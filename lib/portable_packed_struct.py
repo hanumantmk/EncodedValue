@@ -1,7 +1,8 @@
 class CLASS:
-    def __init__(self, name, fields):
+    def __init__(self, name, fields, intrusive = False):
         self.name = name
         self.fields = fields
+        self.intrusive = intrusive
 
     def cpp(self):
         name = self.name
@@ -14,14 +15,28 @@ class CLASS:
 
         out.extend(["class ", name, " {\n"])
 
-        out.extend(["    char * storage;\n\n"])
+        out.append("    template <int A, int B>\n")
+        out.append("    class _max {\n")
+        out.append("    public:\n")
+        out.append("        static const int result = A > B ? A : B;\n")
+        out.append("    };\n")
+
+        out.extend(["    static const int _size = ", ' + '.join(sizeof), ";\n\n"])
+
+        if (self.intrusive):
+            out.extend(["    char storage[_size];\n\n"])
+        else:
+            out.extend(["    char * storage;\n\n"])
 
         out.extend(["public:\n"])
 
-        out.extend(["    ", name, "(char * storage) : storage(storage) {}\n\n"])
+        if (self.intrusive):
+            out.extend(["    ", name, "() {}\n\n"])
+        else:
+            out.extend(["    ", name, "(char * storage) : storage(storage) {}\n\n"])
 
         out.extend(["    int size() {\n"])
-        out.extend(["        return ", ' + '.join(sizeof), ";\n"])
+        out.extend(["        return _size;\n"])
         out.extend(["    }\n\n"])
 
         out.extend(["    void zero() {\n"])
@@ -136,12 +151,12 @@ class UNION:
     def sizeof(self):
         out = []
         for i in xrange(len(self.fields) - 1):
-            out.extend([ "std::max(", self.fields[i].sizeof(), ", "])
+            out.extend([ "_max< ", self.fields[i].sizeof(), ", "])
 
         out.append( self.fields[len(self.fields) - 1].sizeof() )
 
         for i in xrange(len(self.fields) - 1):
-            out.append( ")" )
+            out.append( ">::result " )
 
         return ''.join(out)
 

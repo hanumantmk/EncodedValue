@@ -39,7 +39,7 @@ print(CLASS("TestClass", [
         ]),
         FIELD("long long", "i64", 2),
     ])
-]).cpp())
+], True).cpp())
 
 print(CLASS("DoubleClass", [
     FIELD("double", "doubleValue"),
