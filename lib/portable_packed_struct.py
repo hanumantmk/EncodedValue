@@ -21,6 +21,8 @@ class CLASS:
         out.append("        static const int result = A > B ? A : B;\n")
         out.append("    };\n")
 
+        out.extend(["public:\n"])
+
         out.extend(["    static const int _size = ", ' + '.join(sizeof), ";\n\n"])
 
         if (self.intrusive):
@@ -28,10 +30,12 @@ class CLASS:
         else:
             out.extend(["    char * storage;\n\n"])
 
-        out.extend(["public:\n"])
+        out.extend(["    ", name, "() {}\n\n"])
 
         if (self.intrusive):
-            out.extend(["    ", name, "() {}\n\n"])
+            out.extend(["    ", name, "(char * in) {\n"])
+            out.extend(["        std::memcpy(storage, in, _size);\n"])
+            out.extend(["    }\n\n"])
         else:
             out.extend(["    ", name, "(char * storage) : storage(storage) {}\n\n"])
 
@@ -195,4 +199,47 @@ class STRUCT:
         for i in xrange(len(fields)):
             out.extend(fields[i].cpp(' + '.join(offset[i])))
 
+        return out
+
+class PPSTRUCT:
+    def __init__(self, t, name, array = None):
+        self.type = t
+        self.name = name
+        self.array = array
+
+    def sizeof(self):
+        if self.array is None:
+            return self.type + "::_size"
+        else:
+            return "(" + self.type + "::_size * " + str(self.array) + ")"
+
+    def cpp(self, offset_str):
+        out = []
+        out.extend(["    char * ptr_to_", self.name, "() {\n"])
+        out.extend(["        int off = ", offset_str, ";\n"])
+        out.extend(["        return storage + off;\n"])
+        out.extend(["    }\n\n"])
+        out.extend(["    int size_of_", self.name, "() {\n"])
+        out.extend(["        return ", self.sizeof(), ";\n"])
+        out.extend(["    }\n\n"])
+
+        if self.array is None:
+            out.extend(["    ", self.type, " get_", self.name, "() {\n"])
+            out.extend(["        return ", self.type, "(ptr_to_", self.name, "());\n"])
+            out.extend(["    }\n\n"])
+            out.extend(["    void set_", self.name, "(", self.type, " & x) {\n"])
+            out.extend(["        std::memcpy(ptr_to_", self.name, "(), x.base(), ", self.type, "::_size);\n"])
+            out.extend(["        return;\n"])
+            out.extend(["    }\n\n"])
+        else:
+            out.extend(["    int number_of_", self.name, "() {\n"])
+            out.extend(["        return ", str(self.array), ";\n"])
+            out.extend(["    }\n\n"])
+            out.extend(["    ", self.type, " get_", self.name, "(int idx) {\n"])
+            out.extend(["        return ", self.type, "(ptr_to_", self.name, "() + (", self.type, "::_size * idx));\n"])
+            out.extend(["    }\n\n"])
+            out.extend(["    void set_", self.name, "(int idx, ", self.type, " & x) {\n"])
+            out.extend(["        std::memcpy(ptr_to_", self.name, "() + (", self.type, "::_size * idx), x.base(), ", self.type, "::_size);\n"])
+            out.extend(["        return;\n"])
+            out.extend(["    }\n\n"])
         return out

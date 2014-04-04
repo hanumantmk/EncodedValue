@@ -3,6 +3,16 @@ from portable_packed_struct import *
 print("#include <cstring>\n\n")
 print("#include <algorithm>\n\n")
 
+print(CLASS("TestEmbed", [
+    FIELD("int", "intValue"),
+    FIELD("short", "shortValue"),
+]).cpp())
+
+print(CLASS("TestEmbedCopy", [
+    FIELD("int", "intValue"),
+    FIELD("short", "shortValue"),
+], True).cpp())
+
 print(CLASS("TestClass", [
     UNION([
         STRUCT([
@@ -37,6 +47,9 @@ print(CLASS("TestClass", [
                 ])
             ])
         ]),
+        PPSTRUCT("TestEmbed", "te"),
+        PPSTRUCT("TestEmbedCopy", "tec"),
+        PPSTRUCT("TestEmbed", "te_array", 2),
         FIELD("long long", "i64", 2),
     ])
 ], True).cpp())

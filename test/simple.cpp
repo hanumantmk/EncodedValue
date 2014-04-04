@@ -6,6 +6,8 @@
 void test_simple(void)
 {
     TestClass tc;
+    TestEmbed te;
+    TestEmbedCopy tec;
 
     assert(tc.size() == 16);
     assert(tc.size() == sizeof(tc));
@@ -47,6 +49,27 @@ void test_simple(void)
 
     assert(tc.get_i64(0) == 100);
     assert(tc.get_i64(1) == 5);
+
+    tc.zero();
+
+    te = tc.get_te_array(0);
+    te.set_shortValue(5);
+    te.set_intValue(1023);
+
+    assert(te.get_shortValue() == 5);
+    assert(te.get_intValue() == 1023);
+
+    te = tc.get_te();
+
+    assert(te.get_shortValue() == 5);
+    assert(te.get_intValue() == 1023);
+
+    tec = tc.get_tec();
+
+    tc.zero();
+
+    assert(tec.get_shortValue() == 5);
+    assert(tec.get_intValue() == 1023);
 }
 
 void run_test(const char * name, void (* test)(void))
