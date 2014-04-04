@@ -1,19 +1,17 @@
 class CLASS:
-    def __init__(self, name, fields, intrusive = False):
+    def __init__(self, name, fields):
         self.name = name
         self.fields = fields
-        self.intrusive = intrusive
 
     def cpp(self):
-        name = self.name
         fields = self.fields
         out = []
+
+        out.extend(["namespace ", self.name, " {\n"])
 
         sizeof = ["0"]
         for field in fields:
             sizeof.append(field.sizeof())
-
-        out.extend(["class ", name, " {\n"])
 
         out.append("    template <int A, int B>\n")
         out.append("    class _max {\n")
@@ -21,23 +19,16 @@ class CLASS:
         out.append("        static const int result = A > B ? A : B;\n")
         out.append("    };\n")
 
-        out.extend(["public:\n"])
-
         out.extend(["    static const int _size = ", ' + '.join(sizeof), ";\n\n"])
 
-        if (self.intrusive):
-            out.extend(["    char storage[_size];\n\n"])
-        else:
-            out.extend(["    char * storage;\n\n"])
+        out.extend(["template <typename T>\n"])
+        out.extend(["class Base {\n"])
+        out.extend(["protected:\n"])
+        out.extend(["    T storage;\n"])
 
-        out.extend(["    ", name, "() {}\n\n"])
+        out.extend(["public:\n"])
 
-        if (self.intrusive):
-            out.extend(["    ", name, "(char * in) {\n"])
-            out.extend(["        std::memcpy(storage, in, _size);\n"])
-            out.extend(["    }\n\n"])
-        else:
-            out.extend(["    ", name, "(char * storage) : storage(storage) {}\n\n"])
+        out.extend(["    static const int _size = ", self.name, "::_size;\n\n"])
 
         out.extend(["    int size() {\n"])
         out.extend(["        return _size;\n"])
@@ -62,9 +53,46 @@ class CLASS:
         for i in xrange(len(fields)):
             out.extend(fields[i].cpp(' + '.join(offset[i])))
 
-        out.extend(["};\n"])
+        out.extend(["};\n\n"])
+        self._cpp_helper(out, False);
+        self._cpp_helper(out, True);
+
+        out.extend(["}"])
 
         return ''.join(out)
+    
+    def _cpp_helper(self, out, intrusive):
+        if (intrusive):
+            name = "Data"
+            storage = "char[" + self.name + "::_size]"
+        else:
+            name = "Ptr"
+            storage = "char *"
+
+        fields = self.fields
+
+        out.extend(["class ", name, " : public Base<", storage, "> {\n"])
+
+        out.extend(["public:\n"])
+
+        out.extend(["    ", name, "() {}\n\n"])
+
+        if (intrusive):
+            out.extend(["    ", name, "(char * in) {\n"])
+            out.extend(["        std::memcpy(storage, in, _size);\n"])
+            out.extend(["    }\n\n"])
+            out.extend(["    ", name, "(Ptr p) {\n"])
+            out.extend(["        std::memcpy(storage, p.base(), _size);\n"])
+            out.extend(["    }\n\n"])
+            out.extend(["    Ptr ptr() {\n"])
+            out.extend(["        return Ptr(storage);\n"])
+            out.extend(["    }\n\n"])
+        else:
+            out.extend(["    ", name, "(char * in) {\n"])
+            out.extend(["        storage = in;\n"])
+            out.extend(["    }\n\n"])
+
+        out.extend(["};\n\n"])
 
 class FIELD:
     def __init__(self, t, name, array = None):

@@ -8,11 +8,6 @@ print(CLASS("TestEmbed", [
     FIELD("short", "shortValue"),
 ]).cpp())
 
-print(CLASS("TestEmbedCopy", [
-    FIELD("int", "intValue"),
-    FIELD("short", "shortValue"),
-], True).cpp())
-
 print(CLASS("TestClass", [
     UNION([
         STRUCT([
@@ -47,12 +42,11 @@ print(CLASS("TestClass", [
                 ])
             ])
         ]),
-        PPSTRUCT("TestEmbed", "te"),
-        PPSTRUCT("TestEmbedCopy", "tec"),
-        PPSTRUCT("TestEmbed", "te_array", 2),
+        PPSTRUCT("TestEmbed::Ptr", "te"),
+        PPSTRUCT("TestEmbed::Ptr", "te_array", 2),
         FIELD("long long", "i64", 2),
     ])
-], True).cpp())
+]).cpp())
 
 print(CLASS("DoubleClass", [
     FIELD("double", "doubleValue"),

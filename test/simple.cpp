@@ -5,9 +5,9 @@
 
 void test_simple(void)
 {
-    TestClass tc;
-    TestEmbed te;
-    TestEmbedCopy tec;
+    TestClass::Data tc;
+    TestEmbed::Ptr te;
+    TestEmbed::Data tec;
 
     assert(tc.size() == 16);
     assert(tc.size() == sizeof(tc));
@@ -38,7 +38,7 @@ void test_simple(void)
 
     tc.set_doubleValue(5.89);
 
-    DoubleClass dc(tc.ptr_to_doubleValue());
+    DoubleClass::Ptr dc(tc.ptr_to_doubleValue());
 
     assert(dc.get_doubleValue() == 5.89);
 
@@ -64,7 +64,7 @@ void test_simple(void)
     assert(te.get_shortValue() == 5);
     assert(te.get_intValue() == 1023);
 
-    tec = tc.get_tec();
+    tec = tc.get_te();
 
     tc.zero();
 
