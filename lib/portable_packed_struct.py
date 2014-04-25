@@ -13,12 +13,7 @@ class CLASS:
         for field in fields:
             sizeof.append(field.sizeof())
 
-        out.append("    template <int A, int B>\n")
-        out.append("    class _max {\n")
-        out.append("    public:\n")
-        out.append("        static const int result = A > B ? A : B;\n")
-        out.append("    };\n")
-
+        out.extend(["    using namespace PortablePackedStruct;\n\n"])
         out.extend(["    static const int _size = ", ' + '.join(sizeof), ";\n\n"])
 
         out.extend(["template <typename T>\n"])
@@ -30,15 +25,11 @@ class CLASS:
 
         out.extend(["    static const int _size = ", self.name, "::_size;\n\n"])
 
-        out.extend(["    int size() {\n"])
-        out.extend(["        return _size;\n"])
-        out.extend(["    }\n\n"])
-
         out.extend(["    void zero() {\n"])
-        out.extend(["        std::memset(storage, 0, size());\n"])
+        out.extend(["        std::memset(storage, 0, _size);\n"])
         out.extend(["    }\n\n"])
 
-        out.extend(["    char * base() {\n"])
+        out.extend(["    char * ptr() {\n"])
         out.extend(["        return storage;\n"])
         out.extend(["    }\n\n"])
 
@@ -82,7 +73,7 @@ class CLASS:
             out.extend(["        std::memcpy(storage, in, _size);\n"])
             out.extend(["    }\n\n"])
             out.extend(["    ", name, "(Ptr p) {\n"])
-            out.extend(["        std::memcpy(storage, p.base(), _size);\n"])
+            out.extend(["        std::memcpy(storage, p.ptr(), _size);\n"])
             out.extend(["    }\n\n"])
             out.extend(["    Ptr ptr() {\n"])
             out.extend(["        return Ptr(storage);\n"])
@@ -108,37 +99,15 @@ class FIELD:
 
     def cpp(self, offset_str):
         out = []
-        out.extend(["    char * ptr_to_", self.name, "() {\n"])
-        out.extend(["        int off = ", offset_str, ";\n"])
-        out.extend(["        return storage + off;\n"])
-        out.extend(["    }\n\n"])
-        out.extend(["    int size_of_", self.name, "() {\n"])
-        out.extend(["        return ", self.sizeof(), ";\n"])
-        out.extend(["    }\n\n"])
-
         if self.array is None:
-            out.extend(["    ", self.type, " get_", self.name, "() {\n"])
-            out.extend(["        ", self.type, " x;\n\n"])
-            out.extend(["        std::memcpy(&x, ptr_to_", self.name, "(), sizeof(", self.type, "));\n"])
-            out.extend(["        return x;\n"])
-            out.extend(["    }\n\n"])
-            out.extend(["    void set_", self.name, "(", self.type, " x) {\n"])
-            out.extend(["        std::memcpy(ptr_to_", self.name, "(), &x, sizeof(", self.type, "));\n"])
-            out.extend(["        return;\n"])
+            out.extend(["    Pointer<Impl::Memcpy<", self.type, "> >::Reference ", self.name, "() {\n"])
+            out.extend(["        return *Pointer<Impl::Memcpy<", self.type, "> >(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
-            out.extend(["    int number_of_", self.name, "() {\n"])
-            out.extend(["        return ", str(self.array), ";\n"])
+            out.extend(["    Pointer<Impl::Memcpy<", self.type, "> > ", self.name, "() {\n"])
+            out.extend(["        return Pointer<Impl::Memcpy<", self.type, "> >(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
-            out.extend(["    ", self.type, " get_", self.name, "(int idx) {\n"])
-            out.extend(["        ", self.type, " x;\n\n"])
-            out.extend(["        std::memcpy(&x, ptr_to_", self.name, "() + (sizeof(", self.type, ") * idx), sizeof(", self.type, "));\n"])
-            out.extend(["        return x;\n"])
-            out.extend(["    }\n\n"])
-            out.extend(["    void set_", self.name, "(int idx, ", self.type, " x) {\n"])
-            out.extend(["        std::memcpy(ptr_to_", self.name, "() + (sizeof(", self.type, ") * idx), &x, sizeof(", self.type, "));\n"])
-            out.extend(["        return;\n"])
-            out.extend(["    }\n\n"])
+
         return out
 
 class BITFIELD:
@@ -151,21 +120,15 @@ class BITFIELD:
 
     def cpp(self, offset_str):
         out = []
-        out.extend(self.root.cpp(offset_str))
-
         offset = 0
 
         for field in self.fields:
-            out.extend(["    ", field.type, " get_", field.name, "() {\n"])
-            out.extend(["        ", self.root.type, " x = get_", self.root.name, "();\n\n"])
-            out.extend(["        return ((x >> ", str(offset), ") & ((1 << ", str(field.bits), ") - 1));\n"])
+            bitfield_impl = "Impl::BitField< " + field.type + ", " + self.root.type + ", " + str(offset) + ", " + str(field.bits) + ">"
+
+            out.extend(["    Pointer<", bitfield_impl, " >::Reference ", field.name, "() {\n"])
+            out.extend(["        return *Pointer<", bitfield_impl, " >(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
-            out.extend(["    void set_", field.name, "(", field.type, " x) {\n"])
-            out.extend(["        ", self.root.type, " y = get_", self.root.name, "();\n\n"])
-            out.extend(["        y &= ~(((1 << ", str(field.bits), ") - 1) << ", str(offset), ");\n"]);
-            out.extend(["        y |= (x << ", str(offset), ");\n"]);
-            out.extend(["        set_", self.root.name, "(y);\n"]);
-            out.extend(["    }\n\n"])
+
             offset += field.bits
 
         return out
@@ -243,31 +206,17 @@ class PPSTRUCT:
 
     def cpp(self, offset_str):
         out = []
-        out.extend(["    char * ptr_to_", self.name, "() {\n"])
+        out.extend(["    char * ptr", self.name, "() {\n"])
         out.extend(["        int off = ", offset_str, ";\n"])
         out.extend(["        return storage + off;\n"])
         out.extend(["    }\n\n"])
-        out.extend(["    int size_of_", self.name, "() {\n"])
-        out.extend(["        return ", self.sizeof(), ";\n"])
-        out.extend(["    }\n\n"])
 
         if self.array is None:
-            out.extend(["    ", self.type, " get_", self.name, "() {\n"])
-            out.extend(["        return ", self.type, "(ptr_to_", self.name, "());\n"])
-            out.extend(["    }\n\n"])
-            out.extend(["    void set_", self.name, "(", self.type, " & x) {\n"])
-            out.extend(["        std::memcpy(ptr_to_", self.name, "(), x.base(), ", self.type, "::_size);\n"])
-            out.extend(["        return;\n"])
+            out.extend(["    Pointer<Impl::PPS<", self.type, "> >::Reference ", self.name, "() {\n"])
+            out.extend(["        return *Pointer<Impl::PPS<", self.type, "> >(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
-            out.extend(["    int number_of_", self.name, "() {\n"])
-            out.extend(["        return ", str(self.array), ";\n"])
-            out.extend(["    }\n\n"])
-            out.extend(["    ", self.type, " get_", self.name, "(int idx) {\n"])
-            out.extend(["        return ", self.type, "(ptr_to_", self.name, "() + (", self.type, "::_size * idx));\n"])
-            out.extend(["    }\n\n"])
-            out.extend(["    void set_", self.name, "(int idx, ", self.type, " & x) {\n"])
-            out.extend(["        std::memcpy(ptr_to_", self.name, "() + (", self.type, "::_size * idx), x.base(), ", self.type, "::_size);\n"])
-            out.extend(["        return;\n"])
+            out.extend(["    Pointer<Impl::PPS<", self.type, "> > ", self.name, "() {\n"])
+            out.extend(["        return Pointer<Impl::PPS<", self.type, "> >(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         return out

@@ -1,7 +1,6 @@
 from portable_packed_struct import *
 
-print("#include <cstring>\n\n")
-print("#include <algorithm>\n\n")
+print("#include \"PortablePackedStruct.h\"\n\n")
 
 print(CLASS("TestEmbed", [
     FIELD("int", "intValue"),
