@@ -5,71 +5,71 @@
 
 void test_simple(void)
 {
-    TestClass::Data tc;
-    TestEmbed::Ptr te;
-    TestEmbed::Data tec;
+    TestClass::Data tc_data;
+    TestEmbed::Ptr te_ptr;
+    TestEmbed::Data te_data;
 
-    assert(tc._size == 16);
-    assert(tc._size == sizeof(tc));
+    assert(tc_data._size == 16);
+    assert(tc_data._size == sizeof(tc_data));
 
-    tc.type() = 5;
+    tc_data.type() = 5;
 
-    assert(tc.type() == 5);
+    assert(tc_data.type() == 5);
 
-    tc.zero();
+    tc_data.zero();
 
-    char * base = tc.ptr().ptr();
+    char * base = tc_data.ptr();
 
-    for (int i = 0; i < tc._size; i++) {
+    for (int i = 0; i < tc_data._size; i++) {
         assert(base[i] == 0);
     }
 
-    tc.refCounter() = 1;
-    tc.pada() = 12;
-    tc.shortStr() = 0;
-    tc.padb() = 2;
+    tc_data.refCounter() = 1;
+    tc_data.pada() = 12;
+    tc_data.shortStr() = 0;
+    tc_data.padb() = 2;
 
-    assert(tc.refCounter() == 1);
-    assert(tc.pada() == 12);
-    assert(tc.shortStr() == 0);
-    assert(tc.padb() == 2);
+    assert(tc_data.refCounter() == 1);
+    assert(tc_data.pada() == 12);
+    assert(tc_data.shortStr() == 0);
+    assert(tc_data.padb() == 2);
 
-    tc.zero();
+    tc_data.zero();
 
-    tc.doubleValue() = 5.89;
+    tc_data.doubleValue() = 5.89;
 
-    DoubleClass::Ptr dc(tc.doubleValue().ptr());
+    DoubleClass::Ptr dc(tc_data.doubleValue().ptr());
 
     assert(dc.doubleValue() == 5.89);
 
-    tc.zero();
+    tc_data.zero();
 
-    tc.i64()[0] = 100;
-    tc.i64()[1] = 5;
+    tc_data.i64()[0] = 100;
+    tc_data.i64()[1] = 5;
 
-    assert(tc.i64()[0] == 100);
-    assert(tc.i64()[1] == 5);
+    assert(tc_data.i64()[0] == 100);
+    assert(tc_data.i64()[1] == 5);
 
-    tc.zero();
+    tc_data.zero();
 
-    te = tc.te_array()[0];
-    te.shortValue() = 5;
-    te.intValue() = 1023;
+    te_ptr = tc_data.te_array()[0];
+    te_ptr.shortValue() = 5;
+    te_ptr.intValue() = 1023;
 
-    assert(te.shortValue() == 5);
-    assert(te.intValue() == 1023);
+    assert(te_ptr.shortValue() == 5);
+    assert(te_ptr.intValue() == 1023);
 
-    te = tc.te();
+    te_ptr = tc_data.te();
 
-    assert(te.shortValue() == 5);
-    assert(te.intValue() == 1023);
+    assert(te_ptr.shortValue() == 5);
+    assert(te_ptr.intValue() == 1023);
 
-    tec = TestEmbed::Data(tc.te());
+    te_data = TestEmbed::Data(tc_data.te());
 
-    tc.zero();
+    tc_data.zero();
 
-    assert(tec.shortValue() == 5);
-    assert(tec.intValue() == 1023);
+    assert(te_data.shortValue() == 5);
+    assert(te_data.intValue() == 1023);
 }
 
 void run_test(const char * name, void (* test)(void))

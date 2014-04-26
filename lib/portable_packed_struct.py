@@ -68,15 +68,16 @@ class CLASS:
 
         out.extend(["    ", name, "() {}\n\n"])
 
+        out.extend(["    char * ptr() {\n"])
+        out.extend(["        return storage;\n"])
+        out.extend(["    }\n\n"])
+
         if (intrusive):
             out.extend(["    ", name, "(char * in) {\n"])
             out.extend(["        std::memcpy(storage, in, _size);\n"])
             out.extend(["    }\n\n"])
             out.extend(["    ", name, "(Ptr p) {\n"])
             out.extend(["        std::memcpy(storage, p.ptr(), _size);\n"])
-            out.extend(["    }\n\n"])
-            out.extend(["    Ptr ptr() {\n"])
-            out.extend(["        return Ptr(storage);\n"])
             out.extend(["    }\n\n"])
         else:
             out.extend(["    ", name, "(char * in) {\n"])
@@ -206,10 +207,6 @@ class PPSTRUCT:
 
     def cpp(self, offset_str):
         out = []
-        out.extend(["    char * ptr", self.name, "() {\n"])
-        out.extend(["        int off = ", offset_str, ";\n"])
-        out.extend(["        return storage + off;\n"])
-        out.extend(["    }\n\n"])
 
         if self.array is None:
             out.extend(["    Pointer<Impl::PPS<", self.type, "> >::Reference ", self.name, "() {\n"])
