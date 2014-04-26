@@ -10,12 +10,12 @@ static const int _size = 0 + sizeof(int) + sizeof(short);
 
 namespace Impl {
 
-template<class M, class R>
+template<class M>
 class Pointer {
     char * _ptr;
 
 public:
-    typedef R Reference;
+    typedef typename M::reference Reference;
 
     Pointer(char * ptr) : _ptr(ptr) { }
 
@@ -69,61 +69,13 @@ public:
         return *this;
     }
 
-    R operator[](int x) {
-        return R (_ptr + (x * M::size));
+    Reference operator[](int x) {
+        return Reference(_ptr + (x * M::size));
     }
 
-    R operator*() const {
-        return R(_ptr);
+    Reference operator*() const {
+        return Reference(_ptr);
     }
-};
-
-template <typename T>
-class Memcpy {
-public:
-    static const size_t size = sizeof(T);
-    typedef T type;
-
-    static inline void writeTo(const T& t, void * ptr) {
-        std::memcpy(ptr, &t, size);
-    }
-
-    static inline void readFrom(T& t, const void * ptr) {
-        std::memcpy(&t, ptr, size);
-    }
-};
-
-template <typename T, typename Base, int offset, int bits>
-class BitField {
-public:
-    static const size_t size = sizeof(Base);
-    typedef T type;
-
-    static inline void writeTo(const T& t, void * ptr) {
-        Base b;
-        Memcpy<Base>::readFrom(b, ptr);
-        b &= ~(((1 << bits) - 1) << offset);
-        b |= t << offset;
-
-        Memcpy<Base>::writeTo(b, ptr);
-    }
-
-    static inline void readFrom(T& t, const void * ptr) {
-        Base b;
-        T tmp;
-        Memcpy<Base>::readFrom(b, ptr);
-
-        tmp = (b >> offset) & ((1 << bits) - 1);
-
-        t = tmp;
-    }
-};
-
-template <typename T>
-class PPS {
-public:
-    static const size_t size = T::_size;
-    typedef T type;
 };
 
 template <class M>
@@ -160,24 +112,75 @@ private:
     char * _ptr;
 };
 
-}
-
-template <class T>
-class Pointer : public Impl::Pointer<Impl::Memcpy<T>, Impl::Reference<Impl::Memcpy<T> > > {
+template <typename T>
+class Memcpy {
 public:
-    Pointer(char * in) : Impl::Pointer<Impl::Memcpy<T>, Impl::Reference<Impl::Memcpy<T> > >(in) {}
+    static const size_t size = sizeof(T);
+    typedef T type;
+    typedef Reference<Memcpy> reference;
+
+    static inline void writeTo(const T& t, void * ptr) {
+        std::memcpy(ptr, &t, size);
+    }
+
+    static inline void readFrom(T& t, const void * ptr) {
+        std::memcpy(&t, ptr, size);
+    }
 };
 
 template <typename T, typename Base, int offset, int bits>
-class BitFieldPointer : public Impl::Pointer<Impl::BitField<T, Base, offset, bits>, Impl::Reference<Impl::BitField<T, Base, offset, bits> > > {
+class BitField {
 public:
-    BitFieldPointer(char * in) : Impl::Pointer<Impl::BitField<T, Base, offset, bits>, Impl::Reference<Impl::BitField<T, Base, offset, bits> > >(in) {}
+    static const size_t size = sizeof(Base);
+    typedef T type;
+    typedef Reference<BitField> reference;
+
+    static inline void writeTo(const T& t, void * ptr) {
+        Base b;
+        std::memcpy(&b, ptr, sizeof(Base));
+        b &= ~(((1 << bits) - 1) << offset);
+        b |= t << offset;
+
+        std::memcpy(ptr, &b, sizeof(Base));
+    }
+
+    static inline void readFrom(T& t, const void * ptr) {
+        Base b;
+        T tmp;
+        std::memcpy(&b, ptr, sizeof(Base));
+
+        tmp = (b >> offset) & ((1 << bits) - 1);
+
+        t = tmp;
+    }
+};
+
+template <typename T, class R>
+class PPS {
+public:
+    static const size_t size = T::_size;
+    typedef T type;
+    typedef R reference;
+};
+
+}
+
+template <class T>
+class Pointer : public Impl::Pointer<Impl::Memcpy<T> > {
+public:
+    Pointer(char * in) : Impl::Pointer<Impl::Memcpy<T> >(in) {}
+};
+
+template <typename T, typename Base, int offset, int bits>
+class BitFieldPointer : public Impl::Pointer<Impl::BitField<T, Base, offset, bits> > {
+public:
+    BitFieldPointer(char * in) : Impl::Pointer<Impl::BitField<T, Base, offset, bits> >(in) {}
 };
 
 template <class T>
-class PPSPointer : public Impl::Pointer<Impl::PPS<T>, typename T::Ptr> {
+class PPSPointer : public Impl::Pointer<Impl::PPS<T, typename T::Ptr> > {
 public:
-    PPSPointer(char * in) : Impl::Pointer<Impl::PPS<T>, typename T::Ptr>(in) {}
+    PPSPointer(char * in) : Impl::Pointer<Impl::PPS<T, typename T::Ptr> >(in) {}
 };
 
 }
