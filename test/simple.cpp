@@ -3,6 +3,19 @@
 
 #include <iostream>
 
+void test_basic(void)
+{
+    char buf[20] = { 0 };
+
+    PortablePackedStruct::Pointer<int> f(buf + 2);
+
+    f += 2;
+    *f = 55;
+    f--;
+    f++;
+    assert(*f == 55);
+}
+
 void test_simple(void)
 {
     TestClass::Data tc_data;
@@ -64,7 +77,7 @@ void test_simple(void)
     assert(te_ptr.shortValue() == 5);
     assert(te_ptr.intValue() == 1023);
 
-    te_data = TestEmbed::Data(tc_data.te());
+    te_data = tc_data.te();
 
     tc_data.zero();
 
@@ -84,6 +97,7 @@ int main(int argc, char ** argv)
     std::cout << "Running tests..." << std::endl;
 
     run_test("simple", &test_simple);
+    run_test("basic", &test_basic);
 
     std::cout << "Tests finished..." << std::endl;
 }

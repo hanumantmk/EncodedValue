@@ -101,12 +101,12 @@ class FIELD:
     def cpp(self, offset_str):
         out = []
         if self.array is None:
-            out.extend(["    Pointer<Impl::Memcpy<", self.type, "> >::Reference ", self.name, "() {\n"])
-            out.extend(["        return *Pointer<Impl::Memcpy<", self.type, "> >(storage +", offset_str, ");\n"])
+            out.extend(["    Pointer<", self.type, ">::Reference ", self.name, "() {\n"])
+            out.extend(["        return *Pointer<", self.type, ">(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
-            out.extend(["    Pointer<Impl::Memcpy<", self.type, "> > ", self.name, "() {\n"])
-            out.extend(["        return Pointer<Impl::Memcpy<", self.type, "> >(storage +", offset_str, ");\n"])
+            out.extend(["    Pointer<", self.type, "> ", self.name, "() {\n"])
+            out.extend(["        return Pointer<", self.type, ">(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
 
         return out
@@ -124,10 +124,10 @@ class BITFIELD:
         offset = 0
 
         for field in self.fields:
-            bitfield_impl = "Impl::BitField< " + field.type + ", " + self.root.type + ", " + str(offset) + ", " + str(field.bits) + ">"
+            bitfield_impl = field.type + ", " + self.root.type + ", " + str(offset) + ", " + str(field.bits)
 
-            out.extend(["    Pointer<", bitfield_impl, " >::Reference ", field.name, "() {\n"])
-            out.extend(["        return *Pointer<", bitfield_impl, " >(storage +", offset_str, ");\n"])
+            out.extend(["    BitFieldPointer<", bitfield_impl, " >::Reference ", field.name, "() {\n"])
+            out.extend(["        return *BitFieldPointer<", bitfield_impl, " >(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
 
             offset += field.bits
@@ -209,11 +209,11 @@ class PPSTRUCT:
         out = []
 
         if self.array is None:
-            out.extend(["    Pointer<Impl::PPS<", self.type, "> >::Reference ", self.name, "() {\n"])
-            out.extend(["        return *Pointer<Impl::PPS<", self.type, "> >(storage +", offset_str, ");\n"])
+            out.extend(["    PPSPointer<", self.type, ">::Reference ", self.name, "() {\n"])
+            out.extend(["        return *PPSPointer<", self.type, ">(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
-            out.extend(["    Pointer<Impl::PPS<", self.type, "> > ", self.name, "() {\n"])
-            out.extend(["        return Pointer<Impl::PPS<", self.type, "> >(storage +", offset_str, ");\n"])
+            out.extend(["    PPSPointer<", self.type, "> ", self.name, "() {\n"])
+            out.extend(["        return PPSPointer<", self.type, ">(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         return out

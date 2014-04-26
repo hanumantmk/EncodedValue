@@ -8,44 +8,14 @@ public:
 };
 static const int _size = 0 + sizeof(int) + sizeof(short);
 
-template<class M>
+namespace Impl {
+
+template<class M, class R>
 class Pointer {
     char * _ptr;
 
-    typedef typename M::type T;
 public:
-
-    class Reference {
-        friend class Pointer;
-    public:
-        Reference& operator=( const T& other ) {
-            M::writeTo(other, _ptr);
-            
-            return *this;
-        }
-
-        operator T() {
-            T t;
-            M::readFrom(t, _ptr);
-
-            return t;
-        }
-
-        char * ptr() const {
-            return _ptr;
-        }
-
-        Reference(const Reference& other) {
-            _ptr = other._ptr;
-        }
-
-    private:
-        Reference(char * ptr) : _ptr(ptr) { }
-        Reference() {}
-        Reference& operator=(const Reference& other) {}
-
-        char * _ptr;
-    };
+    typedef R Reference;
 
     Pointer(char * ptr) : _ptr(ptr) { }
 
@@ -93,22 +63,20 @@ public:
         return tmp;
     }
 
-    Reference operator[](int x) {
-        return Reference(_ptr + (x * M::size));
-    }
-
     Pointer & operator=(const Pointer & other) {
         _ptr = other._ptr;
 
         return *this;
     }
 
-    Reference operator*() const {
-        return Reference(_ptr);
+    R operator[](int x) {
+        return R (_ptr + (x * M::size));
+    }
+
+    R operator*() const {
+        return R(_ptr);
     }
 };
-
-namespace Impl {
 
 template <typename T>
 class Memcpy {
@@ -156,15 +124,60 @@ class PPS {
 public:
     static const size_t size = T::_size;
     typedef T type;
+};
 
-    static inline void writeTo(const T& t, void * ptr) {
-        std::memcpy(ptr, t.ptr(), T::_size);
+template <class M>
+class Reference {
+typedef typename M::type T;
+public:
+    Reference& operator=( const T& other ) {
+        M::writeTo(other, _ptr);
+        
+        return *this;
     }
 
-    static inline void readFrom(T& t, const void * ptr) {
-        t = T((char *)ptr);
+    operator T() {
+        T t;
+        M::readFrom(t, _ptr);
+
+        return t;
     }
+
+    char * ptr() const {
+        return _ptr;
+    }
+
+    Reference(const Reference& other) {
+        _ptr = other._ptr;
+    }
+
+    Reference(char * ptr) : _ptr(ptr) { }
+
+private:
+    Reference() {}
+    Reference& operator=(const Reference& other) {}
+
+    char * _ptr;
 };
 
 }
+
+template <class T>
+class Pointer : public Impl::Pointer<Impl::Memcpy<T>, Impl::Reference<Impl::Memcpy<T> > > {
+public:
+    Pointer(char * in) : Impl::Pointer<Impl::Memcpy<T>, Impl::Reference<Impl::Memcpy<T> > >(in) {}
+};
+
+template <typename T, typename Base, int offset, int bits>
+class BitFieldPointer : public Impl::Pointer<Impl::BitField<T, Base, offset, bits>, Impl::Reference<Impl::BitField<T, Base, offset, bits> > > {
+public:
+    BitFieldPointer(char * in) : Impl::Pointer<Impl::BitField<T, Base, offset, bits>, Impl::Reference<Impl::BitField<T, Base, offset, bits> > >(in) {}
+};
+
+template <class T>
+class PPSPointer : public Impl::Pointer<Impl::PPS<T>, typename T::Ptr> {
+public:
+    PPSPointer(char * in) : Impl::Pointer<Impl::PPS<T>, typename T::Ptr>(in) {}
+};
+
 }
