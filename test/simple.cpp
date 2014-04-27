@@ -67,21 +67,22 @@ void test_simple(void)
 
     te_ptr = tc_data.te_array()[0];
     te_ptr.shortValue() = 5;
+    te_ptr.shortValue() += 10;
     te_ptr.intValue() = 1023;
 
-    assert(te_ptr.shortValue() == 5);
+    assert(te_ptr.shortValue() == 15);
     assert(te_ptr.intValue() == 1023);
 
     te_ptr = tc_data.te();
 
-    assert(te_ptr.shortValue() == 5);
+    assert(te_ptr.shortValue() == 15);
     assert(te_ptr.intValue() == 1023);
 
     te_data = tc_data.te();
 
     tc_data.zero();
 
-    assert(te_data.shortValue() == 5);
+    assert(te_data.shortValue() == 15);
     assert(te_data.intValue() == 1023);
 }
 

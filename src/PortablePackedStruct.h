@@ -95,6 +95,90 @@ public:
         return t;
     }
 
+    Reference& operator+=(const T& other) {
+        operator=(operator T() + other);
+
+        return *this;
+    }
+
+    Reference& operator-=(const T& other) {
+        operator=(operator T() - other);
+
+        return *this;
+    }
+
+    Reference& operator*=(const T& other) {
+        operator=(operator T() * other);
+
+        return *this;
+    }
+
+    Reference& operator/=(const T& other) {
+        operator=(operator T() / other);
+
+        return *this;
+    }
+
+    Reference& operator%=(const T& other) {
+        operator=(operator T() % other);
+
+        return *this;
+    }
+
+    Reference& operator&=(const T& other) {
+        operator=(operator T() & other);
+
+        return *this;
+    }
+
+    Reference& operator|=(const T& other) {
+        operator=(operator T() | other);
+
+        return *this;
+    }
+
+    Reference& operator^=(const T& other) {
+        operator=(operator T() ^ other);
+
+        return *this;
+    }
+
+    Reference& operator<<=(const T& other) {
+        operator=(operator T() << other);
+
+        return *this;
+    }
+
+    Reference& operator>>=(const T& other) {
+        operator=(operator T() >> other);
+
+        return *this;
+    }
+
+    Reference& operator++() {
+        operator+=(1);
+
+        return *this;
+    }
+
+    T operator++(int) {
+        T tmp = operator T();
+        operator++();
+        return tmp;
+    }
+
+    Reference& operator--() {
+        operator-=(1);
+
+        return *this;
+    }
+
+    T operator--(int) {
+        T tmp = operator T();
+        operator--();
+        return tmp;
+    }
+
     char * ptr() const {
         return _ptr;
     }
