@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-void test_basic(void)
+void test_pointer(void)
 {
     char buf[20] = { 0 };
 
@@ -14,6 +14,73 @@ void test_basic(void)
     f--;
     f++;
     assert(*f == 55);
+}
+
+void test_reference(void)
+{
+    char buf[20] = { 0 };
+
+    PortablePackedStruct::Pointer<int> g(buf + 2);
+    PortablePackedStruct::Pointer<int>::Reference f = *g;
+
+    f = 10;
+    assert(f == 10);
+
+    f = 10;
+    f += 2;
+    assert(f == 12);
+
+    f = 12;
+    f -= 2;
+    assert(f == 10);
+
+    f = 10;
+    f *= 2;
+    assert(f == 20);
+
+    f = 20;
+    f /= 2;
+    assert(f == 10);
+
+    f = 15;
+    f %= 8;
+    assert(f == 7);
+
+    f = 5;
+    f &= 3;
+    assert(f == 1);
+
+    f = 8;
+    f |= 3;
+    assert(f == 11);
+
+    f = 2;
+    f ^= 10;
+    assert(f == 8);
+
+    f = 1;
+    f <<= 3;
+    assert(f == 8);
+
+    f = 16;
+    f >>= 3;
+    assert(f == 2);
+
+    f = 16;
+    assert(f++ == 16);
+    assert(f == 17);
+
+    f = 16;
+    assert(f-- == 16);
+    assert(f == 15);
+
+    f = 16;
+    assert(++f == 17);
+    assert(f == 17);
+
+    f = 16;
+    assert(--f == 15);
+    assert(f == 15);
 }
 
 void test_simple(void)
@@ -98,7 +165,8 @@ int main(int argc, char ** argv)
     std::cout << "Running tests..." << std::endl;
 
     run_test("simple", &test_simple);
-    run_test("basic", &test_basic);
+    run_test("pointer", &test_pointer);
+    run_test("reference", &test_reference);
 
     std::cout << "Tests finished..." << std::endl;
 }
