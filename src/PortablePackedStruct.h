@@ -1,4 +1,6 @@
 #include <cstring>
+#include <algorithm>
+#include <iostream>
 
 namespace PortablePackedStruct {
 template <int A, int B>
@@ -6,6 +8,54 @@ class _max {
 public:
     static const int result = A > B ? A : B;
 };
+
+namespace endian {
+
+template<typename T>
+class needsSwab {
+public:
+    static const bool result = false;
+};
+
+#pragma push_macro("NEEDS_SWAB")
+#define NEEDS_SWAB(type) \
+    template<> \
+    class needsSwab<type> { \
+    public: \
+        static const bool result = true; \
+    };
+
+NEEDS_SWAB(int16_t);
+NEEDS_SWAB(uint16_t);
+NEEDS_SWAB(int32_t);
+NEEDS_SWAB(uint32_t);
+NEEDS_SWAB(int64_t);
+NEEDS_SWAB(uint64_t);
+NEEDS_SWAB(double);
+NEEDS_SWAB(float);
+
+#undef NEEDS_SWAB
+#pragma pop_macro("NEEDS_SWAB")
+
+template<typename T>
+inline T swab(T t) {
+    char * front, * back;
+
+    if (! needsSwab<T>::result) {
+        return t;
+    }
+
+    front = (char *)&t;
+    back = front + sizeof(T) - 1;
+
+    for (; front < back; ++front, --back) {
+        std::swap(*front, *back);
+    }
+
+    return t;
+}
+
+}
 
 namespace Impl {
 
@@ -195,7 +245,7 @@ private:
     char * _ptr;
 };
 
-template <typename T>
+template <typename T, bool convertEndian>
 class Memcpy {
 public:
     static const size_t size = sizeof(T);
@@ -203,15 +253,24 @@ public:
     typedef Reference<Memcpy> reference;
 
     static inline void writeTo(const T& t, void * ptr) {
-        std::memcpy(ptr, &t, size);
+        if (endian::needsSwab<T>::result && convertEndian) {
+            T tmp = endian::swab(t);
+            std::memcpy(ptr, &tmp, size);
+        } else {
+            std::memcpy(ptr, &t, size);
+        }
     }
 
     static inline void readFrom(T& t, const void * ptr) {
         std::memcpy(&t, ptr, size);
+
+        if (endian::needsSwab<T>::result && convertEndian) {
+            t = endian::swab(t);
+        }
     }
 };
 
-template <typename T, typename Base, int offset, int bits>
+template <typename T, typename Base, int offset, int bits, bool convertEndian>
 class BitField {
 public:
     static const size_t size = sizeof(Base);
@@ -221,8 +280,17 @@ public:
     static inline void writeTo(const T& t, void * ptr) {
         Base b;
         std::memcpy(&b, ptr, sizeof(Base));
+
+        if (endian::needsSwab<Base>::result && convertEndian) {
+            b = endian::swab(b);
+        }
+
         b &= ~(((1 << bits) - 1) << offset);
         b |= t << offset;
+
+        if (endian::needsSwab<Base>::result && convertEndian) {
+            b = endian::swab(b);
+        }
 
         std::memcpy(ptr, &b, sizeof(Base));
     }
@@ -230,7 +298,11 @@ public:
     static inline void readFrom(T& t, const void * ptr) {
         Base b;
         T tmp;
+
         std::memcpy(&b, ptr, sizeof(Base));
+        if (endian::needsSwab<Base>::result && convertEndian) {
+            b = endian::swab(b);
+        }
 
         tmp = (b >> offset) & ((1 << bits) - 1);
 
@@ -247,16 +319,16 @@ public:
 
 }
 
-template <class T>
-class Pointer : public Impl::Pointer<Impl::Memcpy<T> > {
+template <class T, bool convertEndian = true>
+class Pointer : public Impl::Pointer<Impl::Memcpy<T, convertEndian> > {
 public:
-    Pointer(char * in) : Impl::Pointer<Impl::Memcpy<T> >(in) {}
+    Pointer(char * in) : Impl::Pointer<Impl::Memcpy<T, convertEndian> >(in) {}
 };
 
-template <typename T, typename Base, int offset, int bits>
-class BitFieldPointer : public Impl::Pointer<Impl::BitField<T, Base, offset, bits> > {
+template <typename T, typename Base, int offset, int bits, bool convertEndian = true>
+class BitFieldPointer : public Impl::Pointer<Impl::BitField<T, Base, offset, bits, convertEndian> > {
 public:
-    BitFieldPointer(char * in) : Impl::Pointer<Impl::BitField<T, Base, offset, bits> >(in) {}
+    BitFieldPointer(char * in) : Impl::Pointer<Impl::BitField<T, Base, offset, bits, convertEndian> >(in) {}
 };
 
 template <class T>
