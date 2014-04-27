@@ -238,11 +238,11 @@ public:
     }
 };
 
-template <typename T, class R>
+template <typename T>
 class PPS {
 public:
     static const size_t size = T::_size;
-    typedef R reference;
+    typedef typename T::Ptr reference;
 };
 
 }
@@ -260,9 +260,9 @@ public:
 };
 
 template <class T>
-class PPSPointer : public Impl::Pointer<Impl::PPS<T, typename T::Ptr> > {
+class PPSPointer : public Impl::Pointer<Impl::PPS<T> > {
 public:
-    PPSPointer(char * in) : Impl::Pointer<Impl::PPS<T, typename T::Ptr> >(in) {}
+    PPSPointer(char * in) : Impl::Pointer<Impl::PPS<T> >(in) {}
 };
 
 }
