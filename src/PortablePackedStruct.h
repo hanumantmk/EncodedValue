@@ -6,7 +6,6 @@ class _max {
 public:
     static const int result = A > B ? A : B;
 };
-static const int _size = 0 + sizeof(int) + sizeof(short);
 
 namespace Impl {
 
