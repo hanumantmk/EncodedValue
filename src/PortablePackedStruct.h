@@ -243,7 +243,6 @@ template <typename T, class R>
 class PPS {
 public:
     static const size_t size = T::_size;
-    typedef T type;
     typedef R reference;
 };
 
