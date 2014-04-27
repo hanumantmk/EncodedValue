@@ -85,9 +85,9 @@ void test_reference(void)
 
 void test_simple(void)
 {
-    TestClass::Data tc_data;
-    TestEmbed::Ptr te_ptr;
-    TestEmbed::Data te_data;
+    TestClass::Value tc_data;
+    TestEmbed::Reference te_ptr;
+    TestEmbed::Value te_data;
 
     assert(tc_data._size == 16);
     assert(tc_data._size == sizeof(tc_data));
@@ -118,7 +118,7 @@ void test_simple(void)
 
     tc_data.doubleValue() = 5.89;
 
-    DoubleClass::Ptr dc(tc_data.doubleValue().ptr());
+    DoubleClass::Reference dc(tc_data.doubleValue().ptr());
 
     assert(dc.doubleValue() == 5.89);
 

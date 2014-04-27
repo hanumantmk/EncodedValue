@@ -41,8 +41,8 @@ print(CLASS("TestClass", [
                 ])
             ])
         ]),
-        PPSTRUCT("TestEmbed::Ptr", "te"),
-        PPSTRUCT("TestEmbed::Ptr", "te_array", 2),
+        PPSTRUCT("TestEmbed", "te"),
+        PPSTRUCT("TestEmbed", "te_array", 2),
         FIELD("long long", "i64", 2),
     ])
 ]).cpp())

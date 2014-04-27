@@ -29,8 +29,8 @@ class CLASS:
         out.extend(["        std::memset(storage, 0, _size);\n"])
         out.extend(["    }\n\n"])
 
-        out.extend(["    char * ptr() {\n"])
-        out.extend(["        return storage;\n"])
+        out.extend(["    char * ptr() const {\n"])
+        out.extend(["        return (char *)storage;\n"])
         out.extend(["    }\n\n"])
 
         offset = []
@@ -54,10 +54,10 @@ class CLASS:
     
     def _cpp_helper(self, out, intrusive):
         if (intrusive):
-            name = "Data"
+            name = "Value"
             storage = "char[" + self.name + "::_size]"
         else:
-            name = "Ptr"
+            name = "Reference"
             storage = "char *"
 
         fields = self.fields
@@ -68,15 +68,15 @@ class CLASS:
 
         out.extend(["    ", name, "() {}\n\n"])
 
-        out.extend(["    char * ptr() {\n"])
-        out.extend(["        return storage;\n"])
+        out.extend(["    char * ptr() const {\n"])
+        out.extend(["        return (char *)storage;\n"])
         out.extend(["    }\n\n"])
 
         if (intrusive):
             out.extend(["    ", name, "(char * in) {\n"])
             out.extend(["        std::memcpy(storage, in, _size);\n"])
             out.extend(["    }\n\n"])
-            out.extend(["    ", name, "(Ptr p) {\n"])
+            out.extend(["    ", name, "(const Reference & p) {\n"])
             out.extend(["        std::memcpy(storage, p.ptr(), _size);\n"])
             out.extend(["    }\n\n"])
         else:
@@ -209,11 +209,11 @@ class PPSTRUCT:
         out = []
 
         if self.array is None:
-            out.extend(["    PPSPointer<", self.type, ">::Reference ", self.name, "() {\n"])
-            out.extend(["        return *PPSPointer<", self.type, ">(storage +", offset_str, ");\n"])
+            out.extend(["    PPSPointer<", self.type, "::Reference>::Reference ", self.name, "() {\n"])
+            out.extend(["        return *PPSPointer<", self.type, "::Reference>(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
-            out.extend(["    PPSPointer<", self.type, "> ", self.name, "() {\n"])
-            out.extend(["        return PPSPointer<", self.type, ">(storage +", offset_str, ");\n"])
+            out.extend(["    PPSPointer<", self.type, "::Reference> ", self.name, "() {\n"])
+            out.extend(["        return PPSPointer<", self.type, "::Reference>(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         return out
