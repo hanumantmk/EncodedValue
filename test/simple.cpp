@@ -22,8 +22,7 @@ void test_reference(void)
 {
     char buf[20] = { 0 };
 
-    Pointer<int> g(buf + 2);
-    Pointer<int>::Reference f = *g;
+    Pointer<int>::Reference f(buf + 2);
 
     f = 10;
     assert(f == 10);
@@ -162,7 +161,7 @@ void test_ppspointer(void)
 {
     TestEmbed::Value values[10];
 
-    PPSPointer<TestEmbed::Reference> v = &(values[0]);
+    PPSPointer<TestEmbed> v = &(values[0]);
 
     v->intValue() = 10;
     v->shortValue() = 20;

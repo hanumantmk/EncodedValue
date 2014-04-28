@@ -7,13 +7,13 @@ class CLASS:
         fields = self.fields
         out = []
 
-        out.extend(["namespace ", self.name, " {\n"])
+        out.extend(["class ", self.name, " {\n"])
+        out.extend(["public:\n\n"])
 
         sizeof = ["0"]
         for field in fields:
             sizeof.append(field.sizeof())
 
-        out.extend(["    using namespace PortablePackedStruct;\n\n"])
         out.extend(["    static const int _size = ", ' + '.join(sizeof), ";\n\n"])
 
         out.extend(["template <typename T>\n"])
@@ -48,7 +48,7 @@ class CLASS:
         self._cpp_helper(out, False);
         self._cpp_helper(out, True);
 
-        out.extend(["}"])
+        out.extend(["};"])
 
         return ''.join(out)
     
@@ -79,16 +79,16 @@ class CLASS:
             out.extend(["    ", name, "(const Reference & p) {\n"])
             out.extend(["        std::memcpy(storage, p.ptr(), _size);\n"])
             out.extend(["    }\n\n"])
-            out.extend(["    PPSPointer<Reference> operator &() {\n"])
-            out.extend(["        return PPSPointer<Reference>(storage);\n"])
+            out.extend(["    PortablePackedStruct::PPSPointer<", self.name, "> operator &() {\n"])
+            out.extend(["        return PortablePackedStruct::PPSPointer<", self.name, ">(storage);\n"])
             out.extend(["    }\n\n"])
 
         else:
             out.extend(["    ", name, "(char * in) {\n"])
             out.extend(["        storage = in;\n"])
             out.extend(["    }\n\n"])
-            out.extend(["    PPSPointer<Reference> operator &() {\n"])
-            out.extend(["        return PPSPointer<Reference>(storage);\n"])
+            out.extend(["    PortablePackedStruct::PPSPointer<", self.name, "> operator &() {\n"])
+            out.extend(["        return PortablePackedStruct::PPSPointer<", self.name, ">(storage);\n"])
             out.extend(["    }\n\n"])
 
         out.extend(["};\n\n"])
@@ -108,12 +108,12 @@ class FIELD:
     def cpp(self, offset_str):
         out = []
         if self.array is None:
-            out.extend(["    Pointer<", self.type, ">::Reference ", self.name, "() {\n"])
-            out.extend(["        return Pointer<", self.type, ">::Reference(storage +", offset_str, ");\n"])
+            out.extend(["    PortablePackedStruct::Pointer<", self.type, ">::Reference ", self.name, "() {\n"])
+            out.extend(["        return PortablePackedStruct::Pointer<", self.type, ">::Reference(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
-            out.extend(["    Pointer<", self.type, "> ", self.name, "() {\n"])
-            out.extend(["        return Pointer<", self.type, ">(storage +", offset_str, ");\n"])
+            out.extend(["    PortablePackedStruct::Pointer<", self.type, "> ", self.name, "() {\n"])
+            out.extend(["        return PortablePackedStruct::Pointer<", self.type, ">(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
 
         return out
@@ -133,8 +133,8 @@ class BITFIELD:
         for field in self.fields:
             bitfield_impl = field.type + ", " + self.root.type + ", " + str(offset) + ", " + str(field.bits)
 
-            out.extend(["    BitFieldPointer<", bitfield_impl, " >::Reference ", field.name, "() {\n"])
-            out.extend(["        return BitFieldPointer<", bitfield_impl, " >::Reference(storage +", offset_str, ");\n"])
+            out.extend(["    PortablePackedStruct::BitFieldPointer<", bitfield_impl, " >::Reference ", field.name, "() {\n"])
+            out.extend(["        return PortablePackedStruct::BitFieldPointer<", bitfield_impl, " >::Reference(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
 
             offset += field.bits
@@ -154,7 +154,7 @@ class UNION:
     def sizeof(self):
         out = []
         for i in xrange(len(self.fields) - 1):
-            out.extend([ "_max< ", self.fields[i].sizeof(), ", "])
+            out.extend([ "PortablePackedStruct::_max< ", self.fields[i].sizeof(), ", "])
 
         out.append( self.fields[len(self.fields) - 1].sizeof() )
 
@@ -220,7 +220,7 @@ class PPSTRUCT:
             out.extend(["        return ", self.type, "::Reference(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
-            out.extend(["    PPSPointer<", self.type, "::Reference> ", self.name, "() {\n"])
-            out.extend(["        return PPSPointer<", self.type, "::Reference>(storage +", offset_str, ");\n"])
+            out.extend(["    PortablePackedStruct::PPSPointer<", self.type, "> ", self.name, "() {\n"])
+            out.extend(["        return PortablePackedStruct::PPSPointer<", self.type, ">(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         return out
