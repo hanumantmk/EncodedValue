@@ -164,8 +164,8 @@ void test_ppspointer(void)
 
     PPSPointer<TestEmbed::Reference> v = &(values[0]);
 
-    v[0].intValue() = 10;
-    v[0].shortValue() = 20;
+    v->intValue() = 10;
+    v->shortValue() = 20;
 
     assert(values[0].intValue() == 10);
     assert(values[0].shortValue() == 20);
@@ -178,8 +178,8 @@ void test_ppspointer(void)
 
     v++;
 
-    assert(v[0].intValue() == 20);
-    assert(v[0].shortValue() == 40);
+    assert(v->intValue() == 20);
+    assert(v->shortValue() == 40);
 }
 
 void run_test(const char * name, void (* test)(void))

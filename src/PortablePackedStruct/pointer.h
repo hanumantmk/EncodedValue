@@ -71,6 +71,10 @@ public:
     Reference operator*() const {
         return Reference(_ptr);
     }
+
+    Reference * operator->() {
+        return (Reference *)this;
+    }
 };
 
 }
