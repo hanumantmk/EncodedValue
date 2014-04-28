@@ -102,7 +102,7 @@ class FIELD:
         out = []
         if self.array is None:
             out.extend(["    Pointer<", self.type, ">::Reference ", self.name, "() {\n"])
-            out.extend(["        return *Pointer<", self.type, ">(storage +", offset_str, ");\n"])
+            out.extend(["        return Pointer<", self.type, ">::Reference(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
             out.extend(["    Pointer<", self.type, "> ", self.name, "() {\n"])
@@ -127,7 +127,7 @@ class BITFIELD:
             bitfield_impl = field.type + ", " + self.root.type + ", " + str(offset) + ", " + str(field.bits)
 
             out.extend(["    BitFieldPointer<", bitfield_impl, " >::Reference ", field.name, "() {\n"])
-            out.extend(["        return *BitFieldPointer<", bitfield_impl, " >(storage +", offset_str, ");\n"])
+            out.extend(["        return BitFieldPointer<", bitfield_impl, " >::Reference(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
 
             offset += field.bits
@@ -209,8 +209,8 @@ class PPSTRUCT:
         out = []
 
         if self.array is None:
-            out.extend(["    PPSPointer<", self.type, "::Reference>::Reference ", self.name, "() {\n"])
-            out.extend(["        return *PPSPointer<", self.type, "::Reference>(storage +", offset_str, ");\n"])
+            out.extend(["    ", self.type, "::Reference ", self.name, "() {\n"])
+            out.extend(["        return ", self.type, "::Reference(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
             out.extend(["    PPSPointer<", self.type, "::Reference> ", self.name, "() {\n"])
