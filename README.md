@@ -11,7 +11,7 @@ the library) and the memory is read to and written from via std::memcpy.  I.e.
 all memory access is mediated through char \*'s.
 
 The headers can somewhat standalone as template based implementations of more
-complex memory acces.  The basic design is somewhat convuluted, but revolves
+complex memory access.  The basic design is somewhat convoluted, but revolves
 around providing a description of the access desired.  New implementations can
 easily be provided and none of the implementation is really hidden.  See the
 [MetaPointer](#meta_pointer) section for more info.
@@ -22,55 +22,72 @@ APIs slightly more verbose, but ensures portability and correctness.
 Additionally, classes may be placed on top of the same memory safely, since
 reads and writes are via the same type and cannot alias.
 
-A future expansion of this work might include annotations for endianness
-conversions or mutex inclusion for shared memory concurrency.
-
 Features
 --------
 
-* Special Pointer and Reference types
-  * Pointer< Type >
-    * wraps a basic type
-    * Template Args
-      * Type - the underlying type
-    * ::Reference
-      * acts as the underlying type
-      * has value semantics (all assignment overloads)
-  * BitFieldPointer< Type, Base, offset, bits >
-    * wraps bitfield access
-    * Template Args
-      * Type - the return type of the value
-      * Base - the type of the underlying integer field that the bitfield is
-        backed by.
-      * offset - number of shifts to the pointed bits
-      * bits - size of the bitfield
-    * ::Reference
-      * acts as the underlying type
-      * value semantics are like the standard Pointer, but generate bit
-        necessary bit arithmetic
-  * PPSPointer< Type >
-    * wraps Portable Packed Struct access
-    * Template Args
-      * Type - the PPS class
-    * ::Reference
-      * The actual PPS class
-* python based description of a packed struct
-  * descriptions can include:
-    * bitfields
-    * unions
-    * arrays
-    * nested structs (largely for layout in unions)
+### Special Pointer and Reference types
+
+Traits available to all types:
+
+* pointer semantics
+  * ++, --, etc.
+  * pointer movements increment by memory based size of the target
+* ::Reference type returns by operator \*() and operator []()
+  * operator &(), giving back the pointer type
+
+Pointer< Type >
+
+* wraps a basic type
+* Template Args
+  * Type - the underlying type
+* ::Reference
+  * acts as the underlying type
+  * has value semantics (all assignment overloads)
+
+BitFieldPointer< Type, Base, offset, bits >
+* wraps bitfield access
+* Template Args
+  * Type - the return type of the value
+  * Base - the type of the underlying integer field that the bitfield is
+    backed by.
+  * offset - number of shifts to the pointed bits
+  * bits - size of the bitfield
+* ::Reference
+  * acts as the underlying type
+  * value semantics are like the standard Pointer, but generate bit
+    necessary bit arithmetic
+
+PPSPointer< Type >
+* wraps Portable Packed Struct access
+* Template Args
+  * Type - the PPS class
+* ::Reference
+  * The actual PPS class
+
+### python based description of a packed struct
+
+descriptions can include:
+* bitfields
+* unions
+* arrays
+* nested structs (largely for layout in unions)
+
+generates c++ class on top of pointer and reference types
+* Base class type, which contains
+  * ::Value - a type which implements accessors on top of a char[], so
+    actually owns the associated memory.
+  * ::Reference - implemented on a char \*.  I.e. points to memory managed
+    somewhere else.
 * generated classes provide accessor methods:
   * for the class:
-    * size() - size of the underlying memory in bytes
+    * \_size - size of the underlying memory in bytes
     * zero() - zero the underlying memory
     * ptr() - the root pointer
   * for provided fields:
-    * VALUE() - returns a Pointer< T > ::Reference
+    * for regulard fields, returns a Pointer< T > ::Reference
     * for array fields, returns one of the Pointer's
     * for bit fields, returns a BitFieldPointer< ... >
-    * for portable packed struct, returns a PPSPointer< T > ::Reference.  Which
-      is a PPS.  These work in arrays with indexing and pointer arithmetic.
+    * for portable packed struct, returns a pps::Reference
 
 <h2><a name="meta_pointer">Meta Pointer</a></h2>
 
@@ -108,7 +125,6 @@ symbols for Reference.
 Future Work
 -----------
 
-* endian annotations
 * mutex inclusion for thread safety
 * explicit sizes in lieu of sizeof() everywhere
 * optional asserts against out of bounds array access and assignment of overly
