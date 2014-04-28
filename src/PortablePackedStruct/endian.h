@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <stdint.h>
 
 namespace PortablePackedStruct {
 namespace endian {
@@ -19,14 +20,14 @@ public:
         static const bool result = true; \
     };
 
-NEEDS_SWAB(int16_t);
-NEEDS_SWAB(uint16_t);
-NEEDS_SWAB(int32_t);
-NEEDS_SWAB(uint32_t);
-NEEDS_SWAB(int64_t);
-NEEDS_SWAB(uint64_t);
-NEEDS_SWAB(double);
-NEEDS_SWAB(float);
+NEEDS_SWAB(int16_t)
+NEEDS_SWAB(uint16_t)
+NEEDS_SWAB(int32_t)
+NEEDS_SWAB(uint32_t)
+NEEDS_SWAB(int64_t)
+NEEDS_SWAB(uint64_t)
+NEEDS_SWAB(double)
+NEEDS_SWAB(float)
 
 #undef NEEDS_SWAB
 #pragma pop_macro("NEEDS_SWAB")

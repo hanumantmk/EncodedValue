@@ -1,6 +1,8 @@
 #pragma once
 
 #include "PortablePackedStruct/reference.h"
+#include "PortablePackedStruct/endian.h"
+#include <cstring>
 
 namespace PortablePackedStruct {
 namespace Meta {
