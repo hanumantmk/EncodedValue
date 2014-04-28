@@ -43,8 +43,8 @@ inline T swab(T t) {
     front = (char *)&t;
     back = front + sizeof(T) - 1;
 
-    for (; front < back; ++front, --back) {
-        std::swap(*front, *back);
+    while (front < back) {
+        std::swap(*front++, *back--);
     }
 
     return t;
