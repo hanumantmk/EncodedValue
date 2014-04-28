@@ -1,5 +1,6 @@
 #include "PortablePackedStruct/meta/memcpy.h"
 #include "PortablePackedStruct/meta/bitfield.h"
+#include "PortablePackedStruct/pointer.h"
 #include "PortablePackedStruct/meta/pps.h"
 
 namespace PortablePackedStruct {

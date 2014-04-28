@@ -3,11 +3,13 @@
 
 #include <iostream>
 
+using namespace PortablePackedStruct;
+
 void test_pointer(void)
 {
     char buf[20] = { 0 };
 
-    PortablePackedStruct::Pointer<int> f(buf + 2);
+    Pointer<int> f(buf + 2);
 
     f += 2;
     *f = 55;
@@ -20,8 +22,8 @@ void test_reference(void)
 {
     char buf[20] = { 0 };
 
-    PortablePackedStruct::Pointer<int> g(buf + 2);
-    PortablePackedStruct::Pointer<int>::Reference f = *g;
+    Pointer<int> g(buf + 2);
+    Pointer<int>::Reference f = *g;
 
     f = 10;
     assert(f == 10);
@@ -81,12 +83,15 @@ void test_reference(void)
     f = 16;
     assert(--f == 15);
     assert(f == 15);
+
+    (&f)[1] = 10;
+    assert((&f)[1] == 10);
 }
 
 void test_simple(void)
 {
     TestClass::Value tc_data;
-    TestEmbed::Reference te_ptr;
+    TestEmbed::Reference te_ref;
     TestEmbed::Value te_data;
 
     assert(tc_data._size == 16);
@@ -132,18 +137,18 @@ void test_simple(void)
 
     tc_data.zero();
 
-    te_ptr = tc_data.te_array()[0];
-    te_ptr.shortValue() = 5;
-    te_ptr.shortValue() += 10;
-    te_ptr.intValue() = 1023;
+    te_ref = tc_data.te_array()[0];
+    te_ref.shortValue() = 5;
+    te_ref.shortValue() += 10;
+    te_ref.intValue() = 1023;
 
-    assert(te_ptr.shortValue() == 15);
-    assert(te_ptr.intValue() == 1023);
+    assert(te_ref.shortValue() == 15);
+    assert(te_ref.intValue() == 1023);
 
-    te_ptr = tc_data.te();
+    te_ref = tc_data.te();
 
-    assert(te_ptr.shortValue() == 15);
-    assert(te_ptr.intValue() == 1023);
+    assert(te_ref.shortValue() == 15);
+    assert(te_ref.intValue() == 1023);
 
     te_data = tc_data.te();
 
@@ -151,6 +156,30 @@ void test_simple(void)
 
     assert(te_data.shortValue() == 15);
     assert(te_data.intValue() == 1023);
+}
+
+void test_ppspointer(void)
+{
+    TestEmbed::Value values[10];
+
+    PPSPointer<TestEmbed::Reference> v = &(values[0]);
+
+    v[0].intValue() = 10;
+    v[0].shortValue() = 20;
+
+    assert(values[0].intValue() == 10);
+    assert(values[0].shortValue() == 20);
+
+    v[1].intValue() = 20;
+    v[1].shortValue() = 40;
+
+    assert(values[1].intValue() == 20);
+    assert(values[1].shortValue() == 40);
+
+    v++;
+
+    assert(v[0].intValue() == 20);
+    assert(v[0].shortValue() == 40);
 }
 
 void run_test(const char * name, void (* test)(void))
@@ -167,6 +196,7 @@ int main(int argc, char ** argv)
     run_test("simple", &test_simple);
     run_test("pointer", &test_pointer);
     run_test("reference", &test_reference);
+    run_test("ppspointer", &test_ppspointer);
 
     std::cout << "Tests finished..." << std::endl;
 }

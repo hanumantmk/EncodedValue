@@ -3,6 +3,8 @@
 namespace PortablePackedStruct {
 namespace Impl {
 
+template <class M> class Pointer;
+
 template <class M>
 class Reference {
 typedef typename M::type T;
@@ -113,6 +115,10 @@ public:
     }
 
     Reference(char * ptr) : _ptr(ptr) { }
+
+    Impl::Pointer<M> operator&() const {
+        return Impl::Pointer<M>(_ptr);
+    }
 
 private:
     Reference() {}

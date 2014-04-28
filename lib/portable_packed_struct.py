@@ -79,9 +79,16 @@ class CLASS:
             out.extend(["    ", name, "(const Reference & p) {\n"])
             out.extend(["        std::memcpy(storage, p.ptr(), _size);\n"])
             out.extend(["    }\n\n"])
+            out.extend(["    PPSPointer<Reference> operator &() {\n"])
+            out.extend(["        return PPSPointer<Reference>(storage);\n"])
+            out.extend(["    }\n\n"])
+
         else:
             out.extend(["    ", name, "(char * in) {\n"])
             out.extend(["        storage = in;\n"])
+            out.extend(["    }\n\n"])
+            out.extend(["    PPSPointer<Reference> operator &() {\n"])
+            out.extend(["        return PPSPointer<Reference>(storage);\n"])
             out.extend(["    }\n\n"])
 
         out.extend(["};\n\n"])
