@@ -29,3 +29,5 @@ test/example.h: test/gen_example.py lib/encoded_value.py Makefile
 
 clean:
 	rm -f test/data.h simple lib/*.pyc
+
+.PHONY: test clean
