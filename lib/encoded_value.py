@@ -79,16 +79,16 @@ class CLASS:
             out.extend(["    ", name, "(const Reference & p) {\n"])
             out.extend(["        std::memcpy(storage, p.ptr(), _size);\n"])
             out.extend(["    }\n\n"])
-            out.extend(["    PortablePackedStruct::PPSPointer<", self.name, "> operator &() {\n"])
-            out.extend(["        return PortablePackedStruct::PPSPointer<", self.name, ">(storage);\n"])
+            out.extend(["    EncodedValue::EVPointer<", self.name, "> operator &() {\n"])
+            out.extend(["        return EncodedValue::EVPointer<", self.name, ">(storage);\n"])
             out.extend(["    }\n\n"])
 
         else:
             out.extend(["    ", name, "(char * in) {\n"])
             out.extend(["        storage = in;\n"])
             out.extend(["    }\n\n"])
-            out.extend(["    PortablePackedStruct::PPSPointer<", self.name, "> operator &() {\n"])
-            out.extend(["        return PortablePackedStruct::PPSPointer<", self.name, ">(storage);\n"])
+            out.extend(["    EncodedValue::EVPointer<", self.name, "> operator &() {\n"])
+            out.extend(["        return EncodedValue::EVPointer<", self.name, ">(storage);\n"])
             out.extend(["    }\n\n"])
 
         out.extend(["};\n\n"])
@@ -108,12 +108,12 @@ class FIELD:
     def cpp(self, offset_str):
         out = []
         if self.array is None:
-            out.extend(["    PortablePackedStruct::Pointer<", self.type, ">::Reference ", self.name, "() {\n"])
-            out.extend(["        return PortablePackedStruct::Pointer<", self.type, ">::Reference(storage +", offset_str, ");\n"])
+            out.extend(["    EncodedValue::Pointer<", self.type, ">::Reference ", self.name, "() {\n"])
+            out.extend(["        return EncodedValue::Pointer<", self.type, ">::Reference(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
-            out.extend(["    PortablePackedStruct::Pointer<", self.type, "> ", self.name, "() {\n"])
-            out.extend(["        return PortablePackedStruct::Pointer<", self.type, ">(storage +", offset_str, ");\n"])
+            out.extend(["    EncodedValue::Pointer<", self.type, "> ", self.name, "() {\n"])
+            out.extend(["        return EncodedValue::Pointer<", self.type, ">(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
 
         return out
@@ -133,8 +133,8 @@ class BITFIELD:
         for field in self.fields:
             bitfield_impl = field.type + ", " + self.root.type + ", " + str(offset) + ", " + str(field.bits)
 
-            out.extend(["    PortablePackedStruct::BitFieldPointer<", bitfield_impl, " >::Reference ", field.name, "() {\n"])
-            out.extend(["        return PortablePackedStruct::BitFieldPointer<", bitfield_impl, " >::Reference(storage +", offset_str, ");\n"])
+            out.extend(["    EncodedValue::BitFieldPointer<", bitfield_impl, " >::Reference ", field.name, "() {\n"])
+            out.extend(["        return EncodedValue::BitFieldPointer<", bitfield_impl, " >::Reference(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
 
             offset += field.bits
@@ -154,7 +154,7 @@ class UNION:
     def sizeof(self):
         out = []
         for i in xrange(len(self.fields) - 1):
-            out.extend([ "PortablePackedStruct::_max< ", self.fields[i].sizeof(), ", "])
+            out.extend([ "EncodedValue::_max< ", self.fields[i].sizeof(), ", "])
 
         out.append( self.fields[len(self.fields) - 1].sizeof() )
 
@@ -200,7 +200,7 @@ class STRUCT:
 
         return out
 
-class PPSTRUCT:
+class EVSTRUCT:
     def __init__(self, t, name, array = None):
         self.type = t
         self.name = name
@@ -220,7 +220,7 @@ class PPSTRUCT:
             out.extend(["        return ", self.type, "::Reference(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
-            out.extend(["    PortablePackedStruct::PPSPointer<", self.type, "> ", self.name, "() {\n"])
-            out.extend(["        return PortablePackedStruct::PPSPointer<", self.type, ">(storage +", offset_str, ");\n"])
+            out.extend(["    EncodedValue::EVPointer<", self.type, "> ", self.name, "() {\n"])
+            out.extend(["        return EncodedValue::EVPointer<", self.type, ">(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         return out

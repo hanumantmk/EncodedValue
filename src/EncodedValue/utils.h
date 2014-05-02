@@ -1,6 +1,6 @@
 #pragma once
 
-namespace PortablePackedStruct {
+namespace EncodedValue {
 template <int A, int B>
 class _max {
 public:

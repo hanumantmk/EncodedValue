@@ -1,14 +1,14 @@
-PortablePackedStruct
-====================
+EncodedValue
+============
 
 Summary
 -------
 
-Portable packed struct provides headers and a python library capable of
-converting descriptions of memory into viable C++ classes.  The descriptions
-are provided as a tree of python objects of particular type (those provided by
-the library) and the memory is read to and written from via std::memcpy.  I.e.
-all memory access is mediated through char \*'s.
+EncodedValue provides headers and a python library capable of converting
+descriptions of memory into viable C++ classes.  The descriptions are provided
+as a tree of python objects of particular type (those provided by the library)
+and the memory is read to and written from via std::memcpy.  I.e.  all memory
+access is mediated through char \*'s.
 
 The headers can somewhat standalone as template based implementations of more
 complex memory access.  The basic design is somewhat convoluted, but revolves
@@ -57,12 +57,12 @@ BitFieldPointer< Type, Base, offset, bits >
   * value semantics are like the standard Pointer, but generate bit
     necessary bit arithmetic
 
-PPSPointer< Type >
-* wraps Portable Packed Struct access
+EVPointer< Type >
+* wraps Encoded Value Struct access
 * Template Args
-  * Type - the PPS class
+  * Type - the EV class
 * ::Reference
-  * The actual PPS class
+  * The actual EV class
 
 ### python based description of a packed struct
 
@@ -87,7 +87,7 @@ generates c++ class on top of pointer and reference types
     * for regulard fields, returns a Pointer< T > ::Reference
     * for array fields, returns one of the Pointer's
     * for bit fields, returns a BitFieldPointer< ... >
-    * for portable packed struct, returns a pps::Reference
+    * for ev structs, returns a ev::Reference
 
 <h2><a name="meta_pointer">Meta Pointer</a></h2>
 

@@ -1,9 +1,9 @@
-#include "PortablePackedStruct/meta/memcpy.h"
-#include "PortablePackedStruct/meta/bitfield.h"
-#include "PortablePackedStruct/pointer.h"
-#include "PortablePackedStruct/meta/pps.h"
+#include "EncodedValue/meta/memcpy.h"
+#include "EncodedValue/meta/bitfield.h"
+#include "EncodedValue/pointer.h"
+#include "EncodedValue/meta/ev.h"
 
-namespace PortablePackedStruct {
+namespace EncodedValue {
 
 template <class T, bool convertEndian = true>
 class Pointer : public Impl::Pointer<Meta::Memcpy<T, convertEndian> > {
@@ -18,9 +18,9 @@ public:
 };
 
 template <class T>
-class PPSPointer : public Impl::Pointer<Meta::PPS<T> > {
+class EVPointer : public Impl::Pointer<Meta::EV<T> > {
 public:
-    PPSPointer(char * in) : Impl::Pointer<Meta::PPS<T> >(in) {}
+    EVPointer(char * in) : Impl::Pointer<Meta::EV<T> >(in) {}
 };
 
 }

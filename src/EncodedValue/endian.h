@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <stdint.h>
 
-namespace PortablePackedStruct {
+namespace EncodedValue {
 namespace endian {
 
 template<typename T>

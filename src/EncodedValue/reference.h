@@ -1,6 +1,6 @@
 #pragma once
 
-namespace PortablePackedStruct {
+namespace EncodedValue {
 namespace Impl {
 
 template <class M> class Pointer;

@@ -1,6 +1,6 @@
-from portable_packed_struct import *
+from encoded_value import *
 
-print("#include \"PortablePackedStruct.h\"\n\n")
+print("#include \"EncodedValue.h\"\n\n")
 
 print(CLASS("TestEmbed", [
     FIELD("int", "intValue"),
@@ -41,8 +41,8 @@ print(CLASS("TestClass", [
                 ])
             ])
         ]),
-        PPSTRUCT("TestEmbed", "te"),
-        PPSTRUCT("TestEmbed", "te_array", 2),
+        EVSTRUCT("TestEmbed", "te"),
+        EVSTRUCT("TestEmbed", "te_array", 2),
         FIELD("long long", "i64", 2),
     ])
 ]).cpp())

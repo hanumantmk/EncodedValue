@@ -1,10 +1,10 @@
 #pragma once
 
-namespace PortablePackedStruct {
+namespace EncodedValue {
 namespace Meta {
 
 template <typename T>
-class PPS {
+class EV {
 public:
     static const size_t size = T::_size;
     typedef typename T::Reference reference;

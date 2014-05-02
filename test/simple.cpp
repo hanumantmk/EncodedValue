@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-using namespace PortablePackedStruct;
+using namespace EncodedValue;
 
 void test_pointer(void)
 {
@@ -157,11 +157,11 @@ void test_simple(void)
     assert(te_data.intValue() == 1023);
 }
 
-void test_ppspointer(void)
+void test_evpointer(void)
 {
     TestEmbed::Value values[10];
 
-    PPSPointer<TestEmbed> v = &(values[0]);
+    EVPointer<TestEmbed> v = &(values[0]);
 
     v->intValue() = 10;
     v->shortValue() = 20;
@@ -195,7 +195,7 @@ int main(int argc, char ** argv)
     run_test("simple", &test_simple);
     run_test("pointer", &test_pointer);
     run_test("reference", &test_reference);
-    run_test("ppspointer", &test_ppspointer);
+    run_test("evpointer", &test_evpointer);
 
     std::cout << "Tests finished..." << std::endl;
 }

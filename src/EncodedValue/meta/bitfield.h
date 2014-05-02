@@ -1,10 +1,10 @@
 #pragma once
 
-#include "PortablePackedStruct/reference.h"
-#include "PortablePackedStruct/endian.h"
+#include "EncodedValue/reference.h"
+#include "EncodedValue/endian.h"
 #include <cstring>
 
-namespace PortablePackedStruct {
+namespace EncodedValue {
 namespace Meta {
 
 template <typename T, typename Base, int offset, int bits, bool convertEndian>
