@@ -23,4 +23,22 @@ public:
     EVPointer(char * in) : Impl::Pointer<Meta::EV<T> >(in) {}
 };
 
+template <class T, bool convertEndian = true>
+class Reference : public Pointer<T, convertEndian>::Reference {
+public:
+    Reference(char * in) : Pointer<T, convertEndian>::Reference(in) {}
+};
+
+template <typename T, typename Base, int offset, int bits, bool convertEndian = true>
+class BitFieldReference : public BitFieldPointer<T, Base, offset, bits, convertEndian>::Reference {
+public:
+    BitFieldReference(char * in) : BitFieldPointer<T, Base, offset, bits, convertEndian>::Reference(in) {}
+};
+
+template <class T>
+class EVReference : public EVPointer<T>::Reference {
+public:
+    EVReference(char * in) : EVPointer<T>::Reference(in) {}
+};
+
 }

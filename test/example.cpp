@@ -14,7 +14,12 @@ typedef enum {
     KIND_COMPLEX,
 } kind_t;
 
-void modify_complex(Complex::Reference c)
+void modify_int(EncodedValue::Pointer<int>::Reference i)
+{
+    i = 100;
+}
+
+void modify_complex(Complex<>::Reference c)
 {
     c.imag() = 10;
     c.real() = 5;
@@ -22,7 +27,7 @@ void modify_complex(Complex::Reference c)
 
 int main(int argc, char ** argv)
 {
-    Expression::Value v;
+    Expression<>::Value v;
 
     v.op() = TYPE_PLUS;
     v.args()[0].type() = KIND_INT;
@@ -39,7 +44,9 @@ int main(int argc, char ** argv)
     assert(v.args()[1].c().imag() == 5);
 
     modify_complex(v.args()[1].c());
+    modify_int(v.args()[0].i());
 
+    assert(v.args()[0].i() == 100);
     assert(v.args()[1].c().real() == 5);
     assert(v.args()[1].c().imag() == 10);
 

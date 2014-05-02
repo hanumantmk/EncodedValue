@@ -89,9 +89,9 @@ void test_reference(void)
 
 void test_simple(void)
 {
-    TestClass::Value tc_data;
-    TestEmbed::Reference te_ref;
-    TestEmbed::Value te_data;
+    TestClass<>::Value tc_data;
+    TestEmbed<>::Reference te_ref;
+    TestEmbed<>::Value te_data;
 
     assert(tc_data._size == 16);
     assert(tc_data._size == sizeof(tc_data));
@@ -120,7 +120,7 @@ void test_simple(void)
 
     tc_data.doubleValue() = 5.89;
 
-    DoubleClass::Reference dc(tc_data.doubleValue().ptr());
+    DoubleClass<>::Reference dc(tc_data.doubleValue().ptr());
 
     assert(dc.doubleValue() == 5.89);
 
@@ -157,9 +157,9 @@ void test_simple(void)
 
 void test_evpointer(void)
 {
-    TestEmbed::Value values[10];
+    TestEmbed<>::Value values[10];
 
-    EVPointer<TestEmbed> v = &(values[0]);
+    EVPointer<TestEmbed<> > v = &(values[0]);
 
     v->intValue() = 10;
     v->shortValue() = 20;

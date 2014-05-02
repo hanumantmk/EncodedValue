@@ -1,17 +1,20 @@
 #include "EncodedValue.h"
 
 
+template <bool convertEndian = true>
 class Complex {
 public:
 
     static const int _size = 0 + sizeof(double) + sizeof(double);
 
-template <typename T>
-class Base {
-protected:
-    T storage;
+class Reference {
 public:
-    static const int _size = Complex::_size;
+    static const int _size = 0 + sizeof(double) + sizeof(double);
+
+private:
+    char * storage;
+public:
+    Reference() {}
 
     void zero() {
         std::memset(storage, 0, _size);
@@ -21,22 +24,12 @@ public:
         return (char *)storage;
     }
 
-    EncodedValue::Pointer<double>::Reference real() {
-        return EncodedValue::Pointer<double>::Reference(storage +0);
+    typename EncodedValue::Pointer<double, convertEndian>::Reference real() {
+        return typename EncodedValue::Pointer<double, convertEndian>::Reference(storage +0);
     }
 
-    EncodedValue::Pointer<double>::Reference imag() {
-        return EncodedValue::Pointer<double>::Reference(storage +0 + sizeof(double));
-    }
-
-};
-
-class Reference : public Base<char *> {
-public:
-    Reference() {}
-
-    char * ptr() const {
-        return (char *)storage;
+    typename EncodedValue::Pointer<double, convertEndian>::Reference imag() {
+        return typename EncodedValue::Pointer<double, convertEndian>::Reference(storage +0 + sizeof(double));
     }
 
     Reference(char * in) {
@@ -49,12 +42,29 @@ public:
 
 };
 
-class Value : public Base<char[Complex::_size]> {
+class Value {
+public:
+    static const int _size = 0 + sizeof(double) + sizeof(double);
+
+private:
+    char storage[_size];
 public:
     Value() {}
 
+    void zero() {
+        std::memset(storage, 0, _size);
+    }
+
     char * ptr() const {
         return (char *)storage;
+    }
+
+    typename EncodedValue::Pointer<double, convertEndian>::Reference real() {
+        return typename EncodedValue::Pointer<double, convertEndian>::Reference(storage +0);
+    }
+
+    typename EncodedValue::Pointer<double, convertEndian>::Reference imag() {
+        return typename EncodedValue::Pointer<double, convertEndian>::Reference(storage +0 + sizeof(double));
     }
 
     Value(char * in) {
@@ -72,17 +82,20 @@ public:
 };
 
 };
+template <bool convertEndian = true>
 class Type {
 public:
 
-    static const int _size = 0 + sizeof(unsigned char) + EncodedValue::_max< sizeof(int), EncodedValue::_max< sizeof(double), Complex::_size>::result >::result ;
+    static const int _size = 0 + sizeof(unsigned char) + EncodedValue::_max< sizeof(int), EncodedValue::_max< sizeof(double), Complex<convertEndian>::_size>::result >::result ;
 
-template <typename T>
-class Base {
-protected:
-    T storage;
+class Reference {
 public:
-    static const int _size = Type::_size;
+    static const int _size = 0 + sizeof(unsigned char) + EncodedValue::_max< sizeof(int), EncodedValue::_max< sizeof(double), Complex<convertEndian>::_size>::result >::result ;
+
+private:
+    char * storage;
+public:
+    Reference() {}
 
     void zero() {
         std::memset(storage, 0, _size);
@@ -92,30 +105,20 @@ public:
         return (char *)storage;
     }
 
-    EncodedValue::Pointer<unsigned char>::Reference type() {
-        return EncodedValue::Pointer<unsigned char>::Reference(storage +0);
+    typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference type() {
+        return typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference(storage +0);
     }
 
-    EncodedValue::Pointer<int>::Reference i() {
-        return EncodedValue::Pointer<int>::Reference(storage +0 + sizeof(unsigned char));
+    typename EncodedValue::Pointer<int, convertEndian>::Reference i() {
+        return typename EncodedValue::Pointer<int, convertEndian>::Reference(storage +0 + sizeof(unsigned char));
     }
 
-    EncodedValue::Pointer<double>::Reference d() {
-        return EncodedValue::Pointer<double>::Reference(storage +0 + sizeof(unsigned char));
+    typename EncodedValue::Pointer<double, convertEndian>::Reference d() {
+        return typename EncodedValue::Pointer<double, convertEndian>::Reference(storage +0 + sizeof(unsigned char));
     }
 
-    Complex::Reference c() {
-        return Complex::Reference(storage +0 + sizeof(unsigned char));
-    }
-
-};
-
-class Reference : public Base<char *> {
-public:
-    Reference() {}
-
-    char * ptr() const {
-        return (char *)storage;
+    typename Complex<convertEndian>::Reference c() {
+        return typename Complex<convertEndian>::Reference(storage +0 + sizeof(unsigned char));
     }
 
     Reference(char * in) {
@@ -128,12 +131,37 @@ public:
 
 };
 
-class Value : public Base<char[Type::_size]> {
+class Value {
+public:
+    static const int _size = 0 + sizeof(unsigned char) + EncodedValue::_max< sizeof(int), EncodedValue::_max< sizeof(double), Complex<convertEndian>::_size>::result >::result ;
+
+private:
+    char storage[_size];
 public:
     Value() {}
 
+    void zero() {
+        std::memset(storage, 0, _size);
+    }
+
     char * ptr() const {
         return (char *)storage;
+    }
+
+    typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference type() {
+        return typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference(storage +0);
+    }
+
+    typename EncodedValue::Pointer<int, convertEndian>::Reference i() {
+        return typename EncodedValue::Pointer<int, convertEndian>::Reference(storage +0 + sizeof(unsigned char));
+    }
+
+    typename EncodedValue::Pointer<double, convertEndian>::Reference d() {
+        return typename EncodedValue::Pointer<double, convertEndian>::Reference(storage +0 + sizeof(unsigned char));
+    }
+
+    typename Complex<convertEndian>::Reference c() {
+        return typename Complex<convertEndian>::Reference(storage +0 + sizeof(unsigned char));
     }
 
     Value(char * in) {
@@ -151,17 +179,20 @@ public:
 };
 
 };
+template <bool convertEndian = true>
 class Expression {
 public:
 
-    static const int _size = 0 + sizeof(unsigned char) + (Type::_size * 2);
+    static const int _size = 0 + sizeof(unsigned char) + (Type<convertEndian>::_size * 2);
 
-template <typename T>
-class Base {
-protected:
-    T storage;
+class Reference {
 public:
-    static const int _size = Expression::_size;
+    static const int _size = 0 + sizeof(unsigned char) + (Type<convertEndian>::_size * 2);
+
+private:
+    char * storage;
+public:
+    Reference() {}
 
     void zero() {
         std::memset(storage, 0, _size);
@@ -171,22 +202,12 @@ public:
         return (char *)storage;
     }
 
-    EncodedValue::Pointer<unsigned char>::Reference op() {
-        return EncodedValue::Pointer<unsigned char>::Reference(storage +0);
+    typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference op() {
+        return typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference(storage +0);
     }
 
-    EncodedValue::EVPointer<Type> args() {
-        return EncodedValue::EVPointer<Type>(storage +0 + sizeof(unsigned char));
-    }
-
-};
-
-class Reference : public Base<char *> {
-public:
-    Reference() {}
-
-    char * ptr() const {
-        return (char *)storage;
+    EncodedValue::EVPointer<Type<convertEndian> > args() {
+        return EncodedValue::EVPointer<Type<convertEndian> >(storage +0 + sizeof(unsigned char));
     }
 
     Reference(char * in) {
@@ -199,12 +220,29 @@ public:
 
 };
 
-class Value : public Base<char[Expression::_size]> {
+class Value {
+public:
+    static const int _size = 0 + sizeof(unsigned char) + (Type<convertEndian>::_size * 2);
+
+private:
+    char storage[_size];
 public:
     Value() {}
 
+    void zero() {
+        std::memset(storage, 0, _size);
+    }
+
     char * ptr() const {
         return (char *)storage;
+    }
+
+    typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference op() {
+        return typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference(storage +0);
+    }
+
+    EncodedValue::EVPointer<Type<convertEndian> > args() {
+        return EncodedValue::EVPointer<Type<convertEndian> >(storage +0 + sizeof(unsigned char));
     }
 
     Value(char * in) {
