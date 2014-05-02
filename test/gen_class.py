@@ -4,6 +4,7 @@ print("#include \"EncodedValue.h\"\n\n")
 
 print(CLASS("TestEmbed", [
     FIELD("int", "intValue"),
+    SKIP(2),
     FIELD("short", "shortValue"),
 ]).cpp())
 
@@ -11,11 +12,11 @@ print(CLASS("TestClass", [
     UNION([
         STRUCT([
             FIELD("char", "type"),
-            BITFIELD(FIELD("unsigned char", "bm"), [
-                BITFIELDFIELD("unsigned", "refCounter", 1),
-                BITFIELDFIELD("unsigned", "pada", 4),
-                BITFIELDFIELD("unsigned", "shortStr", 1),
-                BITFIELDFIELD("unsigned", "padb", 2),
+            BITFIELD("unsigned char", [
+                FIELD("unsigned", "refCounter", 1),
+                SKIP(4),
+                FIELD("unsigned", "shortStr", 1),
+                FIELD("unsigned", "padb", 2),
             ]),
             UNION([
                 FIELD("char", "oid", 12),

@@ -118,34 +118,41 @@ class FIELD:
 
         return out
 
+class SKIP:
+    def __init__(self, skip):
+        self.skip = skip
+
+    def sizeof(self):
+        return str(self.skip)
+
+    def cpp(self, offset_str):
+        return []
+
 class BITFIELD:
     def __init__(self, root, fields):
         self.fields = fields
         self.root = root
 
     def sizeof(self):
-        return self.root.sizeof()
+        return "sizeof(" + self.root + ")"
 
     def cpp(self, offset_str):
         out = []
         offset = 0
 
         for field in self.fields:
-            bitfield_impl = field.type + ", " + self.root.type + ", " + str(offset) + ", " + str(field.bits)
+            if (isinstance(field, SKIP)):
+                offset += field.skip
+            else:
+                bitfield_impl = field.type + ", " + self.root + ", " + str(offset) + ", " + str(field.array)
 
-            out.extend(["    EncodedValue::BitFieldPointer<", bitfield_impl, " >::Reference ", field.name, "() {\n"])
-            out.extend(["        return EncodedValue::BitFieldPointer<", bitfield_impl, " >::Reference(storage +", offset_str, ");\n"])
-            out.extend(["    }\n\n"])
+                out.extend(["    EncodedValue::BitFieldPointer<", bitfield_impl, " >::Reference ", field.name, "() {\n"])
+                out.extend(["        return EncodedValue::BitFieldPointer<", bitfield_impl, " >::Reference(storage +", offset_str, ");\n"])
+                out.extend(["    }\n\n"])
 
-            offset += field.bits
+                offset += field.array
 
         return out
-
-class BITFIELDFIELD:
-    def __init__(self, t, name, bits):
-        self.type = t
-        self.name = name
-        self.bits = bits
 
 class UNION:
     def __init__(self, fields):

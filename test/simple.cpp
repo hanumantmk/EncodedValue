@@ -109,12 +109,10 @@ void test_simple(void)
     }
 
     tc_data.refCounter() = 1;
-    tc_data.pada() = 12;
     tc_data.shortStr() = 0;
     tc_data.padb() = 2;
 
     assert(tc_data.refCounter() == 1);
-    assert(tc_data.pada() == 12);
     assert(tc_data.shortStr() == 0);
     assert(tc_data.padb() == 2);
 
