@@ -22,7 +22,7 @@ void test_reference(void)
 {
     char buf[20] = { 0 };
 
-    Pointer<int>::Reference f(buf + 2);
+    Reference<int> f(buf + 2);
 
     f = 10;
     assert(f == 10);
@@ -90,7 +90,6 @@ void test_reference(void)
 void test_simple(void)
 {
     TestClass<>::Value tc_data;
-    TestEmbed<>::Reference te_ref;
     TestEmbed<>::Value te_data;
 
     assert(tc_data._size == 16);
@@ -134,7 +133,7 @@ void test_simple(void)
 
     tc_data.zero();
 
-    te_ref = tc_data.te_array()[0];
+    TestEmbed<>::Reference te_ref(tc_data.te_array()[0]);
     te_ref.shortValue() = 5;
     te_ref.shortValue() += 10;
     te_ref.intValue() = 1023;
@@ -142,10 +141,10 @@ void test_simple(void)
     assert(te_ref.shortValue() == 15);
     assert(te_ref.intValue() == 1023);
 
-    te_ref = tc_data.te();
+    TestEmbed<>::Reference te_ref2(tc_data.te());
 
-    assert(te_ref.shortValue() == 15);
-    assert(te_ref.intValue() == 1023);
+    assert(te_ref2.shortValue() == 15);
+    assert(te_ref2.intValue() == 1023);
 
     te_data = tc_data.te();
 
@@ -159,7 +158,7 @@ void test_evpointer(void)
 {
     TestEmbed<>::Value values[10];
 
-    EVPointer<TestEmbed<> > v = &(values[0]);
+    TestEmbed<>::Pointer v = &(values[0]);
 
     v->intValue() = 10;
     v->shortValue() = 20;

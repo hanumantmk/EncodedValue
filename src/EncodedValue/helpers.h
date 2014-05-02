@@ -11,34 +11,36 @@ public:
     Pointer(char * in) : Impl::Pointer<Meta::Memcpy<T, convertEndian> >(in) {}
 };
 
-template <typename T, typename Base, int offset, int bits, bool convertEndian = true>
-class BitFieldPointer : public Impl::Pointer<Meta::BitField<T, Base, offset, bits, convertEndian> > {
-public:
-    BitFieldPointer(char * in) : Impl::Pointer<Meta::BitField<T, Base, offset, bits, convertEndian> >(in) {}
-};
-
-template <class T>
-class EVPointer : public Impl::Pointer<Meta::EV<T> > {
-public:
-    EVPointer(char * in) : Impl::Pointer<Meta::EV<T> >(in) {}
-};
-
 template <class T, bool convertEndian = true>
-class Reference : public Pointer<T, convertEndian>::Reference {
+class Reference : public Impl::Pointer<Meta::Memcpy<T, convertEndian> >::Reference {
 public:
-    Reference(char * in) : Pointer<T, convertEndian>::Reference(in) {}
+    Reference(char * in) : Impl::Pointer<Meta::Memcpy<T, convertEndian> >::Reference(in) {}
+
+    Reference& operator=(const T& t) {
+        Impl::Pointer<Meta::Memcpy<T, convertEndian> >::Reference::operator=(t);
+        return *this;
+    };
+};
+
+namespace BitField {
+
+template <typename T, typename Base, int offset, int bits, bool convertEndian = true>
+class Pointer : public Impl::Pointer<Meta::BitField<T, Base, offset, bits, convertEndian> > {
+public:
+    Pointer(char * in) : Impl::Pointer<Meta::BitField<T, Base, offset, bits, convertEndian> >(in) {}
 };
 
 template <typename T, typename Base, int offset, int bits, bool convertEndian = true>
-class BitFieldReference : public BitFieldPointer<T, Base, offset, bits, convertEndian>::Reference {
+class Reference : public Impl::Pointer<Meta::BitField<T, Base, offset, bits, convertEndian> >::Reference {
 public:
-    BitFieldReference(char * in) : BitFieldPointer<T, Base, offset, bits, convertEndian>::Reference(in) {}
+    Reference(char * in) : Impl::Pointer<Meta::BitField<T, Base, offset, bits, convertEndian> >::Reference(in) {}
+
+    Reference& operator=(const T& t) {
+        Impl::Pointer<Meta::BitField<T, Base, offset, bits, convertEndian> >::Reference::operator=(t);
+        return *this;
+    };
 };
 
-template <class T>
-class EVReference : public EVPointer<T>::Reference {
-public:
-    EVReference(char * in) : EVPointer<T>::Reference(in) {}
-};
+}
 
 }

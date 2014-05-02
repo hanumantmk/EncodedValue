@@ -7,6 +7,12 @@ public:
 
     static const int _size = 0 + sizeof(double) + sizeof(double);
 
+    typedef EncodedValue::Impl::Pointer<EncodedValue::Meta::EV<Complex<convertEndian> > > Pointer;
+
+    class Value;
+
+    class Reference;
+
 class Reference {
 public:
     static const int _size = 0 + sizeof(double) + sizeof(double);
@@ -14,8 +20,6 @@ public:
 private:
     char * storage;
 public:
-    Reference() {}
-
     void zero() {
         std::memset(storage, 0, _size);
     }
@@ -24,20 +28,34 @@ public:
         return (char *)storage;
     }
 
-    typename EncodedValue::Pointer<double, convertEndian>::Reference real() {
-        return typename EncodedValue::Pointer<double, convertEndian>::Reference(storage +0);
+    Reference& operator=(const Reference& p) {
+        std::memcpy(storage, p.ptr(), _size);
+        return *this;
     }
 
-    typename EncodedValue::Pointer<double, convertEndian>::Reference imag() {
-        return typename EncodedValue::Pointer<double, convertEndian>::Reference(storage +0 + sizeof(double));
+    Reference& operator=(const Value& p) {
+        std::memcpy(storage, p.ptr(), _size);
+        return *this;
+    }
+
+    typename EncodedValue::Reference<double, convertEndian> real() {
+        return typename EncodedValue::Reference<double, convertEndian>(storage +0);
+    }
+
+    typename EncodedValue::Reference<double, convertEndian> imag() {
+        return typename EncodedValue::Reference<double, convertEndian>(storage +0 + sizeof(double));
     }
 
     Reference(char * in) {
         storage = in;
     }
 
-    EncodedValue::EVPointer<Complex> operator &() {
-        return EncodedValue::EVPointer<Complex>(storage);
+    Reference(const Value& p) {
+        storage = p.ptr();
+    }
+
+    Pointer operator &() {
+        return Pointer(storage);
     }
 
 };
@@ -49,8 +67,6 @@ public:
 private:
     char storage[_size];
 public:
-    Value() {}
-
     void zero() {
         std::memset(storage, 0, _size);
     }
@@ -59,13 +75,25 @@ public:
         return (char *)storage;
     }
 
-    typename EncodedValue::Pointer<double, convertEndian>::Reference real() {
-        return typename EncodedValue::Pointer<double, convertEndian>::Reference(storage +0);
+    Value& operator=(const Reference& p) {
+        std::memcpy(storage, p.ptr(), _size);
+        return *this;
     }
 
-    typename EncodedValue::Pointer<double, convertEndian>::Reference imag() {
-        return typename EncodedValue::Pointer<double, convertEndian>::Reference(storage +0 + sizeof(double));
+    Value& operator=(const Value& p) {
+        std::memcpy(storage, p.ptr(), _size);
+        return *this;
     }
+
+    typename EncodedValue::Reference<double, convertEndian> real() {
+        return typename EncodedValue::Reference<double, convertEndian>(storage +0);
+    }
+
+    typename EncodedValue::Reference<double, convertEndian> imag() {
+        return typename EncodedValue::Reference<double, convertEndian>(storage +0 + sizeof(double));
+    }
+
+    Value() {}
 
     Value(char * in) {
         std::memcpy(storage, in, _size);
@@ -75,8 +103,12 @@ public:
         std::memcpy(storage, p.ptr(), _size);
     }
 
-    EncodedValue::EVPointer<Complex> operator &() {
-        return EncodedValue::EVPointer<Complex>(storage);
+    Value(const Value& p) {
+        std::memcpy(storage, p.ptr(), _size);
+    }
+
+    Pointer operator &() {
+        return Pointer(storage);
     }
 
 };
@@ -88,6 +120,12 @@ public:
 
     static const int _size = 0 + sizeof(unsigned char) + EncodedValue::_max< sizeof(int), EncodedValue::_max< sizeof(double), Complex<convertEndian>::_size>::result >::result ;
 
+    typedef EncodedValue::Impl::Pointer<EncodedValue::Meta::EV<Type<convertEndian> > > Pointer;
+
+    class Value;
+
+    class Reference;
+
 class Reference {
 public:
     static const int _size = 0 + sizeof(unsigned char) + EncodedValue::_max< sizeof(int), EncodedValue::_max< sizeof(double), Complex<convertEndian>::_size>::result >::result ;
@@ -95,8 +133,6 @@ public:
 private:
     char * storage;
 public:
-    Reference() {}
-
     void zero() {
         std::memset(storage, 0, _size);
     }
@@ -105,16 +141,26 @@ public:
         return (char *)storage;
     }
 
-    typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference type() {
-        return typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference(storage +0);
+    Reference& operator=(const Reference& p) {
+        std::memcpy(storage, p.ptr(), _size);
+        return *this;
     }
 
-    typename EncodedValue::Pointer<int, convertEndian>::Reference i() {
-        return typename EncodedValue::Pointer<int, convertEndian>::Reference(storage +0 + sizeof(unsigned char));
+    Reference& operator=(const Value& p) {
+        std::memcpy(storage, p.ptr(), _size);
+        return *this;
     }
 
-    typename EncodedValue::Pointer<double, convertEndian>::Reference d() {
-        return typename EncodedValue::Pointer<double, convertEndian>::Reference(storage +0 + sizeof(unsigned char));
+    typename EncodedValue::Reference<unsigned char, convertEndian> type() {
+        return typename EncodedValue::Reference<unsigned char, convertEndian>(storage +0);
+    }
+
+    typename EncodedValue::Reference<int, convertEndian> i() {
+        return typename EncodedValue::Reference<int, convertEndian>(storage +0 + sizeof(unsigned char));
+    }
+
+    typename EncodedValue::Reference<double, convertEndian> d() {
+        return typename EncodedValue::Reference<double, convertEndian>(storage +0 + sizeof(unsigned char));
     }
 
     typename Complex<convertEndian>::Reference c() {
@@ -125,8 +171,12 @@ public:
         storage = in;
     }
 
-    EncodedValue::EVPointer<Type> operator &() {
-        return EncodedValue::EVPointer<Type>(storage);
+    Reference(const Value& p) {
+        storage = p.ptr();
+    }
+
+    Pointer operator &() {
+        return Pointer(storage);
     }
 
 };
@@ -138,8 +188,6 @@ public:
 private:
     char storage[_size];
 public:
-    Value() {}
-
     void zero() {
         std::memset(storage, 0, _size);
     }
@@ -148,21 +196,33 @@ public:
         return (char *)storage;
     }
 
-    typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference type() {
-        return typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference(storage +0);
+    Value& operator=(const Reference& p) {
+        std::memcpy(storage, p.ptr(), _size);
+        return *this;
     }
 
-    typename EncodedValue::Pointer<int, convertEndian>::Reference i() {
-        return typename EncodedValue::Pointer<int, convertEndian>::Reference(storage +0 + sizeof(unsigned char));
+    Value& operator=(const Value& p) {
+        std::memcpy(storage, p.ptr(), _size);
+        return *this;
     }
 
-    typename EncodedValue::Pointer<double, convertEndian>::Reference d() {
-        return typename EncodedValue::Pointer<double, convertEndian>::Reference(storage +0 + sizeof(unsigned char));
+    typename EncodedValue::Reference<unsigned char, convertEndian> type() {
+        return typename EncodedValue::Reference<unsigned char, convertEndian>(storage +0);
+    }
+
+    typename EncodedValue::Reference<int, convertEndian> i() {
+        return typename EncodedValue::Reference<int, convertEndian>(storage +0 + sizeof(unsigned char));
+    }
+
+    typename EncodedValue::Reference<double, convertEndian> d() {
+        return typename EncodedValue::Reference<double, convertEndian>(storage +0 + sizeof(unsigned char));
     }
 
     typename Complex<convertEndian>::Reference c() {
         return typename Complex<convertEndian>::Reference(storage +0 + sizeof(unsigned char));
     }
+
+    Value() {}
 
     Value(char * in) {
         std::memcpy(storage, in, _size);
@@ -172,8 +232,12 @@ public:
         std::memcpy(storage, p.ptr(), _size);
     }
 
-    EncodedValue::EVPointer<Type> operator &() {
-        return EncodedValue::EVPointer<Type>(storage);
+    Value(const Value& p) {
+        std::memcpy(storage, p.ptr(), _size);
+    }
+
+    Pointer operator &() {
+        return Pointer(storage);
     }
 
 };
@@ -185,6 +249,12 @@ public:
 
     static const int _size = 0 + sizeof(unsigned char) + (Type<convertEndian>::_size * 2);
 
+    typedef EncodedValue::Impl::Pointer<EncodedValue::Meta::EV<Expression<convertEndian> > > Pointer;
+
+    class Value;
+
+    class Reference;
+
 class Reference {
 public:
     static const int _size = 0 + sizeof(unsigned char) + (Type<convertEndian>::_size * 2);
@@ -192,8 +262,6 @@ public:
 private:
     char * storage;
 public:
-    Reference() {}
-
     void zero() {
         std::memset(storage, 0, _size);
     }
@@ -202,20 +270,34 @@ public:
         return (char *)storage;
     }
 
-    typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference op() {
-        return typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference(storage +0);
+    Reference& operator=(const Reference& p) {
+        std::memcpy(storage, p.ptr(), _size);
+        return *this;
     }
 
-    EncodedValue::EVPointer<Type<convertEndian> > args() {
-        return EncodedValue::EVPointer<Type<convertEndian> >(storage +0 + sizeof(unsigned char));
+    Reference& operator=(const Value& p) {
+        std::memcpy(storage, p.ptr(), _size);
+        return *this;
+    }
+
+    typename EncodedValue::Reference<unsigned char, convertEndian> op() {
+        return typename EncodedValue::Reference<unsigned char, convertEndian>(storage +0);
+    }
+
+    typename Type<convertEndian>::Pointer args() {
+        return typename Type<convertEndian>::Pointer(storage +0 + sizeof(unsigned char));
     }
 
     Reference(char * in) {
         storage = in;
     }
 
-    EncodedValue::EVPointer<Expression> operator &() {
-        return EncodedValue::EVPointer<Expression>(storage);
+    Reference(const Value& p) {
+        storage = p.ptr();
+    }
+
+    Pointer operator &() {
+        return Pointer(storage);
     }
 
 };
@@ -227,8 +309,6 @@ public:
 private:
     char storage[_size];
 public:
-    Value() {}
-
     void zero() {
         std::memset(storage, 0, _size);
     }
@@ -237,13 +317,25 @@ public:
         return (char *)storage;
     }
 
-    typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference op() {
-        return typename EncodedValue::Pointer<unsigned char, convertEndian>::Reference(storage +0);
+    Value& operator=(const Reference& p) {
+        std::memcpy(storage, p.ptr(), _size);
+        return *this;
     }
 
-    EncodedValue::EVPointer<Type<convertEndian> > args() {
-        return EncodedValue::EVPointer<Type<convertEndian> >(storage +0 + sizeof(unsigned char));
+    Value& operator=(const Value& p) {
+        std::memcpy(storage, p.ptr(), _size);
+        return *this;
     }
+
+    typename EncodedValue::Reference<unsigned char, convertEndian> op() {
+        return typename EncodedValue::Reference<unsigned char, convertEndian>(storage +0);
+    }
+
+    typename Type<convertEndian>::Pointer args() {
+        return typename Type<convertEndian>::Pointer(storage +0 + sizeof(unsigned char));
+    }
+
+    Value() {}
 
     Value(char * in) {
         std::memcpy(storage, in, _size);
@@ -253,8 +345,12 @@ public:
         std::memcpy(storage, p.ptr(), _size);
     }
 
-    EncodedValue::EVPointer<Expression> operator &() {
-        return EncodedValue::EVPointer<Expression>(storage);
+    Value(const Value& p) {
+        std::memcpy(storage, p.ptr(), _size);
+    }
+
+    Pointer operator &() {
+        return Pointer(storage);
     }
 
 };

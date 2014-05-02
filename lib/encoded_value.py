@@ -16,6 +16,9 @@ class CLASS:
             sizeof.append(field.sizeof())
 
         out.extend(["    static const int _size = ", ' + '.join(sizeof), ";\n\n"])
+        out.extend(["    typedef EncodedValue::Impl::Pointer<EncodedValue::Meta::EV<", self.name, "<convertEndian> > > Pointer;\n\n"])
+        out.extend(["    class Value;\n\n"])
+        out.extend(["    class Reference;\n\n"])
 
         offset = []
 
@@ -51,7 +54,6 @@ class CLASS:
         out.extend(["    ", storage, ";\n"])
 
         out.extend(["public:\n"])
-        out.extend(["    ", name, "() {}\n\n"])
         out.extend(["    void zero() {\n"])
         out.extend(["        std::memset(storage, 0, _size);\n"])
         out.extend(["    }\n\n"])
@@ -60,26 +62,48 @@ class CLASS:
         out.extend(["        return (char *)storage;\n"])
         out.extend(["    }\n\n"])
 
+        out.extend(["    ", name, "& operator=(const Reference& p) {\n"])
+        out.extend(["        std::memcpy(storage, p.ptr(), _size);\n"])
+        out.extend(["        return *this;\n"])
+        out.extend(["    }\n\n"])
+
+        out.extend(["    ", name, "& operator=(const Value& p) {\n"])
+        out.extend(["        std::memcpy(storage, p.ptr(), _size);\n"])
+        out.extend(["        return *this;\n"])
+        out.extend(["    }\n\n"])
+
         for i in xrange(len(fields)):
             out.extend(fields[i].cpp(' + '.join(offset[i])))
 
         if (intrusive):
+            out.extend(["    ", name, "() {}\n\n"])
             out.extend(["    ", name, "(char * in) {\n"])
             out.extend(["        std::memcpy(storage, in, _size);\n"])
             out.extend(["    }\n\n"])
+
             out.extend(["    ", name, "(const Reference & p) {\n"])
             out.extend(["        std::memcpy(storage, p.ptr(), _size);\n"])
             out.extend(["    }\n\n"])
-            out.extend(["    EncodedValue::EVPointer<", self.name, "> operator &() {\n"])
-            out.extend(["        return EncodedValue::EVPointer<", self.name, ">(storage);\n"])
+
+            out.extend(["    ", name, "(const Value& p) {\n"])
+            out.extend(["        std::memcpy(storage, p.ptr(), _size);\n"])
+            out.extend(["    }\n\n"])
+
+            out.extend(["    Pointer operator &() {\n"])
+            out.extend(["        return Pointer(storage);\n"])
             out.extend(["    }\n\n"])
 
         else:
             out.extend(["    ", name, "(char * in) {\n"])
             out.extend(["        storage = in;\n"])
             out.extend(["    }\n\n"])
-            out.extend(["    EncodedValue::EVPointer<", self.name, "> operator &() {\n"])
-            out.extend(["        return EncodedValue::EVPointer<", self.name, ">(storage);\n"])
+
+            out.extend(["    ", name, "(const Value& p) {\n"])
+            out.extend(["        storage = p.ptr();\n"])
+            out.extend(["    }\n\n"])
+
+            out.extend(["    Pointer operator &() {\n"])
+            out.extend(["        return Pointer(storage);\n"])
             out.extend(["    }\n\n"])
 
         out.extend(["};\n\n"])
@@ -99,8 +123,8 @@ class FIELD:
     def cpp(self, offset_str):
         out = []
         if self.array is None:
-            out.extend(["    typename EncodedValue::Pointer<", self.type, ", convertEndian>::Reference ", self.name, "() {\n"])
-            out.extend(["        return typename EncodedValue::Pointer<", self.type, ", convertEndian>::Reference(storage +", offset_str, ");\n"])
+            out.extend(["    typename EncodedValue::Reference<", self.type, ", convertEndian> ", self.name, "() {\n"])
+            out.extend(["        return typename EncodedValue::Reference<", self.type, ", convertEndian>(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
             out.extend(["    typename EncodedValue::Pointer<", self.type, ", convertEndian> ", self.name, "() {\n"])
@@ -137,8 +161,8 @@ class BITFIELD:
             else:
                 bitfield_impl = field.type + ", " + self.root + ", " + str(offset) + ", " + str(field.array) + ", convertEndian"
 
-                out.extend(["    typename EncodedValue::BitFieldPointer<", bitfield_impl, " >::Reference ", field.name, "() {\n"])
-                out.extend(["        return typename EncodedValue::BitFieldPointer<", bitfield_impl, " >::Reference(storage +", offset_str, ");\n"])
+                out.extend(["    typename EncodedValue::BitField::Reference<", bitfield_impl, "> ", field.name, "() {\n"])
+                out.extend(["        return typename EncodedValue::BitField::Reference<", bitfield_impl, ">(storage +", offset_str, ");\n"])
                 out.extend(["    }\n\n"])
 
                 offset += field.array
@@ -218,7 +242,7 @@ class EVSTRUCT:
             out.extend(["        return typename ", self.type, "<convertEndian>::Reference(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
-            out.extend(["    EncodedValue::EVPointer<", self.type, "<convertEndian> > ", self.name, "() {\n"])
-            out.extend(["        return EncodedValue::EVPointer<", self.type, "<convertEndian> >(storage +", offset_str, ");\n"])
+            out.extend(["    typename ", self.type, "<convertEndian>::Pointer ", self.name, "() {\n"])
+            out.extend(["        return typename ", self.type, "<convertEndian>::Pointer(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         return out
