@@ -28,6 +28,6 @@ test/example.h: test/gen_example.py lib/encoded_value.py Makefile
 	PYTHONPATH=lib python test/gen_example.py > test/example.h
 
 clean:
-	rm -f test/data.h simple lib/*.pyc
+	rm -f test/data.h test/example.h simple lib/*.pyc
 
 .PHONY: test clean
