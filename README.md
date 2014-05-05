@@ -44,7 +44,7 @@ Pointer< Type >
   * acts as the underlying type
   * has value semantics (all assignment overloads)
 
-BitFieldPointer< Type, Base, offset, bits >
+BitField::Pointer< Type, Base, offset, bits >
 * wraps bitfield access
 * Template Args
   * Type - the return type of the value
@@ -57,7 +57,7 @@ BitFieldPointer< Type, Base, offset, bits >
   * value semantics are like the standard Pointer, but generate bit
     necessary bit arithmetic
 
-EVPointer< Type >
+YourType<>::Pointer
 * wraps Encoded Value Struct access
 * Template Args
   * Type - the EV class
@@ -66,27 +66,29 @@ EVPointer< Type >
 
 ### python based description of a packed struct
 
-descriptions can include:
+Descriptions can include:
 * bitfields
 * unions
 * arrays
 * nested structs (largely for layout in unions)
 
-generates c++ class on top of pointer and reference types
+Generates c++ class on top of pointer and reference types
 * Base class type, which contains
   * ::Value - a type which implements accessors on top of a char[], so
     actually owns the associated memory.
   * ::Reference - implemented on a char \*.  I.e. points to memory managed
     somewhere else.
+  * ::Pointer - implemented on a char \*.  Provides pointer semantics for a
+    generated class and dereferences to a ::Reference.
 * generated classes provide accessor methods:
   * for the class:
     * \_size - size of the underlying memory in bytes
     * zero() - zero the underlying memory
     * ptr() - the root pointer
   * for provided fields:
-    * for regulard fields, returns a Pointer< T > ::Reference
+    * for regular fields, returns a Reference< T >
     * for array fields, returns one of the Pointer's
-    * for bit fields, returns a BitFieldPointer< ... >
+    * for bit fields, returns a BitField::Pointer< ... >
     * for ev structs, returns a ev::Reference
 
 <h2><a name="meta_pointer">Meta Pointer</a></h2>
