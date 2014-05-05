@@ -280,8 +280,16 @@ public:
         return *this;
     }
 
-    typename EncodedValue::Reference<unsigned char, convertEndian> op() {
-        return typename EncodedValue::Reference<unsigned char, convertEndian>(storage +0);
+    typename EncodedValue::BitField::Reference<unsigned, unsigned char, 0, 4, convertEndian> op() {
+        return typename EncodedValue::BitField::Reference<unsigned, unsigned char, 0, 4, convertEndian>(storage +0);
+    }
+
+    typename EncodedValue::BitField::Reference<unsigned, unsigned char, 4, 3, convertEndian> precedence() {
+        return typename EncodedValue::BitField::Reference<unsigned, unsigned char, 4, 3, convertEndian>(storage +0);
+    }
+
+    typename EncodedValue::BitField::Reference<unsigned, unsigned char, 7, 1, convertEndian> is_infix() {
+        return typename EncodedValue::BitField::Reference<unsigned, unsigned char, 7, 1, convertEndian>(storage +0);
     }
 
     typename Type<convertEndian>::Pointer args() {
@@ -327,8 +335,16 @@ public:
         return *this;
     }
 
-    typename EncodedValue::Reference<unsigned char, convertEndian> op() {
-        return typename EncodedValue::Reference<unsigned char, convertEndian>(storage +0);
+    typename EncodedValue::BitField::Reference<unsigned, unsigned char, 0, 4, convertEndian> op() {
+        return typename EncodedValue::BitField::Reference<unsigned, unsigned char, 0, 4, convertEndian>(storage +0);
+    }
+
+    typename EncodedValue::BitField::Reference<unsigned, unsigned char, 4, 3, convertEndian> precedence() {
+        return typename EncodedValue::BitField::Reference<unsigned, unsigned char, 4, 3, convertEndian>(storage +0);
+    }
+
+    typename EncodedValue::BitField::Reference<unsigned, unsigned char, 7, 1, convertEndian> is_infix() {
+        return typename EncodedValue::BitField::Reference<unsigned, unsigned char, 7, 1, convertEndian>(storage +0);
     }
 
     typename Type<convertEndian>::Pointer args() {

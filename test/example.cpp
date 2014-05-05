@@ -25,6 +25,11 @@ void modify_complex(Complex<>::Reference c)
     c.real() = 5;
 }
 
+void modify_bitfield(EncodedValue::BitField::Reference<unsigned, unsigned char, 4, 3> b)
+{
+    b = 1;
+}
+
 int main(int argc, char ** argv)
 {
     Expression<>::Value storage[2];
@@ -32,6 +37,8 @@ int main(int argc, char ** argv)
     Expression<>::Pointer vp(storage[0].ptr());
 
     v.op() = TYPE_PLUS;
+    v.is_infix() = true;
+    v.precedence() = 3;
     v.args()[0].type() = KIND_INT;
     v.args()[0].i() = 10;
     v.args()[1].type() = KIND_COMPLEX;
@@ -39,6 +46,8 @@ int main(int argc, char ** argv)
     v.args()[1].c().imag() = 5;
 
     assert(v.op() == TYPE_PLUS);
+    assert(v.is_infix() == true);
+    assert(v.precedence() == 3);
     assert(v.args()[0].type() == KIND_INT);
     assert(v.args()[0].i() == 10);
     assert(v.args()[1].type() == KIND_COMPLEX);
@@ -47,10 +56,12 @@ int main(int argc, char ** argv)
 
     modify_complex(v.args()[1].c());
     modify_int(v.args()[0].i());
+    modify_bitfield(v.precedence());
 
     assert(v.args()[0].i() == 100);
     assert(v.args()[1].c().real() == 5);
     assert(v.args()[1].c().imag() == 10);
+    assert(v.precedence() == 1);
 
     vp[1] = v;
 

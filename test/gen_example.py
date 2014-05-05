@@ -17,6 +17,10 @@ print(CLASS("Type", [
 ]).cpp())
 
 print(CLASS("Expression", [
-    FIELD("unsigned char", "op"),
+    BITFIELD("unsigned char", [
+        FIELD("unsigned", "op", 4),
+        FIELD("unsigned", "precedence", 3),
+        FIELD("unsigned", "is_infix", 1)
+    ]),
     EVSTRUCT("Type", "args", 2)
 ]).cpp())
