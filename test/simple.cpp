@@ -9,7 +9,7 @@ void test_pointer(void)
 {
     char buf[20] = { 0 };
 
-    Pointer<int> f(buf + 2);
+    Pointer<int, endian::Big> f(buf + 2);
 
     f += 2;
     *f = 55;

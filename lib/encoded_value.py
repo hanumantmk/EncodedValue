@@ -7,7 +7,7 @@ class CLASS:
         fields = self.fields
         out = []
 
-        out.extend(["template <bool convertEndian = true>\n"])
+        out.extend(["template <enum EncodedValue::endian::ConvertEndian convertEndian = EncodedValue::endian::Noop>\n"])
         out.extend(["class ", self.name, " {\n"])
         out.extend(["public:\n\n"])
 

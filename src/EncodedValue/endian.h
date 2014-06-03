@@ -6,19 +6,39 @@
 namespace EncodedValue {
 namespace endian {
 
-template<typename T>
+#define ENCODED_VALUE_HOST_ENDIAN 1234
+
+enum ConvertEndian {
+    Noop = 0,
+    Big,
+    Little
+};
+
+template<typename T, enum ConvertEndian e>
 class needsSwab {
 public:
     static const bool result = false;
 };
 
 #pragma push_macro("NEEDS_SWAB")
+
+#if ENCODED_VALUE_HOST_ENDIAN == 4321
 #define NEEDS_SWAB(type) \
     template<> \
-    class needsSwab<type> { \
+    class needsSwab<type, Little> { \
     public: \
         static const bool result = true; \
     };
+#elif ENCODED_VALUE_HOST_ENDIAN == 1234
+#define NEEDS_SWAB(type) \
+    template<> \
+    class needsSwab<type, Big> { \
+    public: \
+        static const bool result = true; \
+    };
+#else
+#  error "Unknown host endianness"
+#endif
 
 NEEDS_SWAB(int16_t)
 NEEDS_SWAB(uint16_t)
@@ -32,11 +52,11 @@ NEEDS_SWAB(float)
 #undef NEEDS_SWAB
 #pragma pop_macro("NEEDS_SWAB")
 
-template<typename T>
+template<typename T, enum ConvertEndian ce>
 inline T swab(T t) {
     char * front, * back;
 
-    if (! needsSwab<T>::result) {
+    if (! needsSwab<T, ce>::result) {
         return t;
     }
 

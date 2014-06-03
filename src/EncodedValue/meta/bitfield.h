@@ -7,7 +7,7 @@
 namespace EncodedValue {
 namespace Meta {
 
-template <typename T, typename Base, int offset, int bits, bool convertEndian>
+template <typename T, typename Base, int offset, int bits, enum endian::ConvertEndian ce>
 class BitField {
 public:
     static const size_t size = sizeof(Base);
@@ -18,15 +18,15 @@ public:
         Base b;
         std::memcpy(&b, ptr, sizeof(Base));
 
-        if (endian::needsSwab<Base>::result && convertEndian) {
-            b = endian::swab(b);
+        if (endian::needsSwab<Base, ce>::result) {
+            b = endian::swab<Base, ce>(b);
         }
 
         b &= ~(((1 << bits) - 1) << offset);
         b |= t << offset;
 
-        if (endian::needsSwab<Base>::result && convertEndian) {
-            b = endian::swab(b);
+        if (endian::needsSwab<Base, ce>::result) {
+            b = endian::swab<Base, ce>(b);
         }
 
         std::memcpy(ptr, &b, sizeof(Base));
@@ -37,8 +37,8 @@ public:
         T tmp;
 
         std::memcpy(&b, ptr, sizeof(Base));
-        if (endian::needsSwab<Base>::result && convertEndian) {
-            b = endian::swab(b);
+        if (endian::needsSwab<Base, ce>::result) {
+            b = endian::swab<Base, ce>(b);
         }
 
         tmp = (b >> offset) & ((1 << bits) - 1);
