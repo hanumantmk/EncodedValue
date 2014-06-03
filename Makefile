@@ -16,10 +16,10 @@ EVHEADERS = \
 	src/EncodedValue/utils.h
 
 simple: test/simple.cpp test/data.h Makefile $(EVHEADERS)
-	g++ -Wall -Werror -ggdb3 -O0 test/simple.cpp -Itest -Isrc -o simple
+	g++ -Wall -Werror -ggdb3 -O2 test/simple.cpp -Itest -Isrc -o simple
 
 example: test/example.cpp test/example.h Makefile $(EVHEADERS)
-	g++ -Wall -Werror -ggdb3 -O0 test/example.cpp -Itest -Isrc -o example
+	g++ -Wall -Werror -ggdb3 -O2 test/example.cpp -Itest -Isrc -o example
 
 test/data.h: test/gen_class.py lib/encoded_value.py Makefile
 	PYTHONPATH=lib python test/gen_class.py > test/data.h

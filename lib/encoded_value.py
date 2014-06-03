@@ -22,10 +22,10 @@ class CLASS:
 
         offset = []
 
-        for i in xrange(len(fields)):
+        for i in range(len(fields)):
             offset.append(["0"])
 
-            for j in xrange(0, i):
+            for j in range(0, i):
                 offset[i].append(fields[j].sizeof())
 
         self._cpp_helper(out, offset, sizeof, False);
@@ -72,7 +72,7 @@ class CLASS:
         out.extend(["        return *this;\n"])
         out.extend(["    }\n\n"])
 
-        for i in xrange(len(fields)):
+        for i in range(len(fields)):
             out.extend(fields[i].cpp(' + '.join(offset[i])))
 
         if (intrusive):
@@ -175,12 +175,12 @@ class UNION:
 
     def sizeof(self):
         out = []
-        for i in xrange(len(self.fields) - 1):
+        for i in range(len(self.fields) - 1):
             out.extend([ "EncodedValue::_max< ", self.fields[i].sizeof(), ", "])
 
         out.append( self.fields[len(self.fields) - 1].sizeof() )
 
-        for i in xrange(len(self.fields) - 1):
+        for i in range(len(self.fields) - 1):
             out.append( ">::result " )
 
         return ''.join(out)
@@ -211,13 +211,13 @@ class STRUCT:
 
         offset = []
 
-        for i in xrange(len(fields)):
+        for i in range(len(fields)):
             offset.append([offset_str])
 
-            for j in xrange(0, i):
+            for j in range(0, i):
                 offset[i].append(fields[j].sizeof())
 
-        for i in xrange(len(fields)):
+        for i in range(len(fields)):
             out.extend(fields[i].cpp(' + '.join(offset[i])))
 
         return out
