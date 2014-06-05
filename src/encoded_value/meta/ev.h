@@ -1,6 +1,6 @@
 #pragma once
 
-namespace EncodedValue {
+namespace encoded_value {
 namespace Meta {
 
 template <typename T>

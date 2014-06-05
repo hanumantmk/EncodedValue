@@ -5,15 +5,15 @@ test: simple example
 	./example
 
 EVHEADERS = \
-	src/EncodedValue.h \
-	src/EncodedValue/endian.h \
-	src/EncodedValue/helpers.h \
-	src/EncodedValue/meta/bitfield.h \
-	src/EncodedValue/meta/memcpy.h \
-	src/EncodedValue/meta/ev.h \
-	src/EncodedValue/pointer.h \
-	src/EncodedValue/reference.h \
-	src/EncodedValue/utils.h
+	src/encoded_value.h \
+	src/encoded_value/endian.h \
+	src/encoded_value/helpers.h \
+	src/encoded_value/meta/bitfield.h \
+	src/encoded_value/meta/memcpy.h \
+	src/encoded_value/meta/ev.h \
+	src/encoded_value/pointer.h \
+	src/encoded_value/reference.h \
+	src/encoded_value/utils.h
 
 simple: test/simple.cpp test/data.h Makefile $(EVHEADERS)
 	g++ -Wall -Werror -ggdb3 -O2 test/simple.cpp -Itest -Isrc -o simple

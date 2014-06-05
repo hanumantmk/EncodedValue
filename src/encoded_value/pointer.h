@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-namespace EncodedValue {
+namespace encoded_value {
 namespace Impl {
 
 template<class M>

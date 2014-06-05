@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <stdint.h>
 
-namespace EncodedValue {
+namespace encoded_value {
 namespace endian {
 
 #define ENCODED_VALUE_HOST_ENDIAN 1234

@@ -1,9 +1,9 @@
-#include "EncodedValue/meta/memcpy.h"
-#include "EncodedValue/meta/bitfield.h"
-#include "EncodedValue/pointer.h"
-#include "EncodedValue/meta/ev.h"
+#include "encoded_value/meta/memcpy.h"
+#include "encoded_value/meta/bitfield.h"
+#include "encoded_value/pointer.h"
+#include "encoded_value/meta/ev.h"
 
-namespace EncodedValue {
+namespace encoded_value {
 
 template <class T, enum endian::ConvertEndian ce = endian::Noop>
 class Pointer : public Impl::Pointer<Meta::Memcpy<T, ce> > {

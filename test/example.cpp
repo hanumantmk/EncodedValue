@@ -14,7 +14,7 @@ typedef enum {
     KIND_COMPLEX,
 } kind_t;
 
-void modify_int(EncodedValue::Reference<int> i)
+void modify_int(encoded_value::Reference<int> i)
 {
     i = 100;
 }
@@ -25,7 +25,7 @@ void modify_complex(Complex<>::Reference c)
     c.real() = 5;
 }
 
-void modify_bitfield(EncodedValue::BitField::Reference<unsigned, unsigned char, 4, 3> b)
+void modify_bitfield(encoded_value::BitField::Reference<unsigned, unsigned char, 4, 3> b)
 {
     b = 1;
 }

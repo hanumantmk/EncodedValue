@@ -1,6 +1,6 @@
 from encoded_value import *
 
-print("#include \"EncodedValue.h\"\n\n")
+print("#include \"encoded_value.h\"\n\n")
 
 print(CLASS("TestEmbed", [
     FIELD("int", "intValue"),

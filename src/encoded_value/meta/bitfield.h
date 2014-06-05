@@ -1,10 +1,10 @@
 #pragma once
 
-#include "EncodedValue/reference.h"
-#include "EncodedValue/endian.h"
+#include "encoded_value/reference.h"
+#include "encoded_value/endian.h"
 #include <cstring>
 
-namespace EncodedValue {
+namespace encoded_value {
 namespace Meta {
 
 template <typename T, typename Base, int offset, int bits, enum endian::ConvertEndian ce>

@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-using namespace EncodedValue;
+using namespace encoded_value;
 
 void test_pointer(void)
 {

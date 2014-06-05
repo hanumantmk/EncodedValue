@@ -1,6 +1,6 @@
 #pragma once
 
-namespace EncodedValue {
+namespace encoded_value {
 template <int A, int B>
 class _max {
 public:

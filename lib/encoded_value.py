@@ -7,7 +7,7 @@ class CLASS:
         fields = self.fields
         out = []
 
-        out.extend(["template <enum EncodedValue::endian::ConvertEndian convertEndian = EncodedValue::endian::Noop>\n"])
+        out.extend(["template <enum encoded_value::endian::ConvertEndian convertEndian = encoded_value::endian::Noop>\n"])
         out.extend(["class ", self.name, " {\n"])
         out.extend(["public:\n\n"])
 
@@ -16,7 +16,7 @@ class CLASS:
             sizeof.append(field.sizeof())
 
         out.extend(["    static const int _size = ", ' + '.join(sizeof), ";\n\n"])
-        out.extend(["    typedef EncodedValue::Impl::Pointer<EncodedValue::Meta::EV<", self.name, "<convertEndian> > > Pointer;\n\n"])
+        out.extend(["    typedef encoded_value::Impl::Pointer<encoded_value::Meta::EV<", self.name, "<convertEndian> > > Pointer;\n\n"])
         out.extend(["    class Value;\n\n"])
         out.extend(["    class Reference;\n\n"])
 
@@ -123,12 +123,12 @@ class FIELD:
     def cpp(self, offset_str):
         out = []
         if self.array is None:
-            out.extend(["    typename EncodedValue::Reference<", self.type, ", convertEndian> ", self.name, "() {\n"])
-            out.extend(["        return typename EncodedValue::Reference<", self.type, ", convertEndian>(storage +", offset_str, ");\n"])
+            out.extend(["    typename encoded_value::Reference<", self.type, ", convertEndian> ", self.name, "() {\n"])
+            out.extend(["        return typename encoded_value::Reference<", self.type, ", convertEndian>(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
         else:
-            out.extend(["    typename EncodedValue::Pointer<", self.type, ", convertEndian> ", self.name, "() {\n"])
-            out.extend(["        return typename EncodedValue::Pointer<", self.type, ", convertEndian>(storage +", offset_str, ");\n"])
+            out.extend(["    typename encoded_value::Pointer<", self.type, ", convertEndian> ", self.name, "() {\n"])
+            out.extend(["        return typename encoded_value::Pointer<", self.type, ", convertEndian>(storage +", offset_str, ");\n"])
             out.extend(["    }\n\n"])
 
         return out
@@ -161,8 +161,8 @@ class BITFIELD:
             else:
                 bitfield_impl = field.type + ", " + self.root + ", " + str(offset) + ", " + str(field.array) + ", convertEndian"
 
-                out.extend(["    typename EncodedValue::BitField::Reference<", bitfield_impl, "> ", field.name, "() {\n"])
-                out.extend(["        return typename EncodedValue::BitField::Reference<", bitfield_impl, ">(storage +", offset_str, ");\n"])
+                out.extend(["    typename encoded_value::BitField::Reference<", bitfield_impl, "> ", field.name, "() {\n"])
+                out.extend(["        return typename encoded_value::BitField::Reference<", bitfield_impl, ">(storage +", offset_str, ");\n"])
                 out.extend(["    }\n\n"])
 
                 offset += field.array
@@ -176,7 +176,7 @@ class UNION:
     def sizeof(self):
         out = []
         for i in range(len(self.fields) - 1):
-            out.extend([ "EncodedValue::_max< ", self.fields[i].sizeof(), ", "])
+            out.extend([ "encoded_value::_max< ", self.fields[i].sizeof(), ", "])
 
         out.append( self.fields[len(self.fields) - 1].sizeof() )
 
