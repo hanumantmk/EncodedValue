@@ -108,6 +108,16 @@ class CLASS:
 
         out.extend(["};\n\n"])
 
+class EXTRA:
+    def __init__(self, body):
+        self.body = body
+
+    def sizeof(self):
+        return "0"
+
+    def cpp(self, offset_str):
+        return [self.body]
+
 class FIELD:
     def __init__(self, t, name, array = None):
         self.type = t

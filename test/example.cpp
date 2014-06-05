@@ -2,6 +2,7 @@
 #include <assert.h>
 
 #include <iostream>
+#include <sstream>
 
 typedef enum {
     TYPE_PLUS = 1,
@@ -75,6 +76,11 @@ int main(int argc, char ** argv)
 
     vp[0] = vp[1];
     assert(vp[0].args()[0].i() == 1);
+
+    std::stringstream ssout;
+    v.dump(ssout);
+
+    assert(ssout.str() == "Expression(1, 1, 1)");
 
     return 0;
 }

@@ -1,6 +1,7 @@
 from encoded_value import *
 
-print("#include \"encoded_value.h\"\n\n")
+print("#include \"encoded_value.h\"\n")
+print("#include <iostream>\n\n")
 
 print(CLASS("Complex", [
     FIELD("double", "real"),
@@ -22,5 +23,12 @@ print(CLASS("Expression", [
         FIELD("unsigned", "precedence", 3),
         FIELD("unsigned", "is_infix", 1)
     ]),
-    EVSTRUCT("Type", "args", 2)
+    EVSTRUCT("Type", "args", 2),
+    EXTRA('''
+
+    void dump(std::ostream & os) {
+        os << "Expression(" << op() << ", " << precedence() << ", " << is_infix() << ")";
+    }
+
+    ''')
 ]).cpp())
